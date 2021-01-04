@@ -2,10 +2,12 @@
 
 """https://adventofcode.com/2015/day/10."""
 
+from itertools import groupby
 import os
 
 
-def look_and_say(digits, iterations):
+def look_and_say_old(digits, iterations):
+    """This is what I wrote before I googled."""
     for _ in range(iterations):
         new_digits = []
 
@@ -22,6 +24,13 @@ def look_and_say(digits, iterations):
 
         new_digits.extend([str(count), counting])
         digits = "".join(new_digits)
+
+    return digits
+
+
+def look_and_say(digits, iterations):
+    for _ in range(iterations):
+        digits = "".join([f"{len(list(g))}{k}" for k, g in groupby(digits)])
 
     return digits
 
