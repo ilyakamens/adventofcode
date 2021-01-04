@@ -4,7 +4,6 @@
 
 from collections import defaultdict
 import os
-import re
 
 
 def iter_lights(start, stop):
