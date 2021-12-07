@@ -14,13 +14,20 @@ cat > $pyfile <<EOL
 
 """https://adventofcode.com/$1/day/$2."""
 
+from collections import defaultdict
 import os
+
+def p1(lines):
+    pass
+
+def p2(lines):
+    pass
 
 if __name__ == "__main__":
     with open(os.path.join(os.path.dirname(__file__), "input", "$2.txt")) as f:
         lines = f.read().splitlines()
 
-    print(f"Part 1: {None}")
+    print(f"Part 1: {p1(lines)}")
 
-    print(f"Part 2: {None}")
+    print(f"Part 2: {p2(lines)}")
 EOL
