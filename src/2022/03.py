@@ -2,7 +2,13 @@
 
 """https://adventofcode.com/2022/day/03."""
 
-import os
+from collections import *
+from os.path import abspath, dirname, join
+import sys
+
+sys.path.append(dirname(dirname(abspath(__file__))))
+
+from utils import *
 
 ASCII_A = 97
 
@@ -22,11 +28,6 @@ def p1(lines):
     return total_priority
 
 
-def chunks(list, size):
-    for i in range(0, len(list), size):
-        yield list[i : i + size]
-
-
 def p2(lines):
     total_priority = 0
 
@@ -39,7 +40,7 @@ def p2(lines):
 
 
 if __name__ == "__main__":
-    with open(os.path.join(os.path.dirname(__file__), "input", "03.txt")) as f:
+    with open(join(dirname(__file__), "input", "03.txt")) as f:
         lines = f.read().splitlines()
 
     print(f"Part 1: {p1(lines)}")

@@ -5,17 +5,22 @@ if [[ $# -lt 2 ]]; then
     exit 1
 fi
 
-pyfile="$1/$2.py"
+pyfile="src/$1/$2.py"
 
-touch $pyfile "$1/input/$2.txt"
+touch $pyfile "src/$1/input/$2.txt"
 chmod a+x $pyfile
 cat > $pyfile <<EOL
 #!/usr/bin/env python
 
 """https://adventofcode.com/$1/day/$2."""
 
-from collections import defaultdict
-import os
+from collections import *
+from os.path import abspath, dirname, join
+import sys
+
+sys.path.append(dirname(dirname(abspath(__file__))))
+
+from utils import *
 
 def p1(lines):
     pass
@@ -24,7 +29,7 @@ def p2(lines):
     pass
 
 if __name__ == "__main__":
-    with open(os.path.join(os.path.dirname(__file__), "input", "$2.txt")) as f:
+    with open(join(dirname(__file__), "input", "$2.txt")) as f:
         lines = f.read().splitlines()
 
     print(f"Part 1: {p1(lines)}")
