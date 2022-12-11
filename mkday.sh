@@ -33,6 +33,6 @@ if __name__ == "__main__":
     with open(join(dirname(__file__), "input", "$2.txt")) as f:
         lines = f.read().splitlines()
 
-    for num, func in ((1, p1), (2, p2)):
-        print(f"Part {num}: {func(lines)}")
+    print(f"Part 1: {p1(lines)}")
+    print(f"Part 2: {p2(lines)}")
 EOL
