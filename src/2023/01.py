@@ -28,11 +28,7 @@ def p2(lines):
     for line in lines:
         first = re.search(regex, line).group()
         last = re.search(rregex, line[::-1]).group()
-        if first in mapping:
-            first = mapping[first]
-        if last in rmapping:
-            last = rmapping[last]
-        sum += int(f"{first}{last}")
+        sum += int(f"{mapping.get(first, first)}{rmapping.get(last, last)}")
 
     return sum
 
