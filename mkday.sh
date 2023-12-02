@@ -14,20 +14,19 @@ cat > $pyfile <<EOL
 
 """https://adventofcode.com/$1/day/$2."""
 
-from collections import *
 from os.path import abspath, dirname, join
-import re
 import sys
 
 sys.path.append(dirname(dirname(abspath(__file__))))
 
-from utils import *
 
 def p1(lines):
     pass
 
+
 def p2(lines):
     pass
+
 
 if __name__ == "__main__":
     with open(join(dirname(__file__), "input", "$2.txt")) as f:
