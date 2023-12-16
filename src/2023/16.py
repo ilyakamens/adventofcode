@@ -100,14 +100,26 @@ if __name__ == "__main__":
             lines = [list(l) for l in f.read().splitlines()]
         i += 1
 
+    p1_theirs = 46
+    p2_theirs = 51
+
+    p1_mine = p1(lines)
+    p2_mine = p2(lines)
+
     print("Examples:")
-    print(f"Part a: {p1(lines)}")
-    print(f"Part b: {p2(lines)}")
+    print(f"Part a (theirs): {p1_theirs}")
+    print(f"Part b (theirs): {p2_theirs}")
+    print()
+    print(f"Part a (mine): {p1_mine}")
+    print(f"Part b (mine): {p2_mine}")
+    print()
     print()
 
     with open(path + "/input.txt") as f:
         lines = [list(l) for l in f.read().splitlines()]
 
     print("Real:")
-    aocd.submit(p1(lines), part="a", day=int(day), year=int(year))
-    aocd.submit(p2(lines), part="b", day=int(day), year=int(year))
+    if p1_theirs == p1_mine:
+        aocd.submit(p1(lines), part="a", day=int(day), year=int(year))
+    if p2_theirs == p2_mine:
+        aocd.submit(p2(lines), part="b", day=int(day), year=int(year))
