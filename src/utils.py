@@ -10,11 +10,11 @@ def chunks(list, size):
         yield list[i : i + size]
 
 
-def rotateleft(matrix):
+def rotate_cw(matrix):
     return [list(l) for l in list(zip(*matrix))[::-1]]
 
 
-def rotateright(matrix):
+def rotate_ccw(matrix):
     return [list(l) for l in list(zip(*matrix[::-1]))]
 
 
