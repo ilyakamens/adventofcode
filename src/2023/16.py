@@ -5,10 +5,8 @@
 from collections import defaultdict
 import copy
 from dataclasses import dataclass
-import os
-import sys
 
-import aocd
+from main import main
 
 
 @dataclass
@@ -89,37 +87,4 @@ def p2(lines):
 
 
 if __name__ == "__main__":
-    year, day, path = sys.argv[1:]
-
-    i = 1
-    while True:
-        example_path = path + f"/example-{i}.txt"
-        if not os.path.exists(example_path):
-            break
-        with open(example_path) as f:
-            lines = [list(l) for l in f.read().splitlines()]
-        i += 1
-
-    p1_theirs = 46
-    p2_theirs = 51
-
-    p1_mine = p1(lines)
-    p2_mine = p2(lines)
-
-    print("Examples:")
-    print(f"Part a (theirs): {p1_theirs}")
-    print(f"Part b (theirs): {p2_theirs}")
-    print()
-    print(f"Part a (mine): {p1_mine}")
-    print(f"Part b (mine): {p2_mine}")
-    print()
-    print()
-
-    with open(path + "/input.txt") as f:
-        lines = [list(l) for l in f.read().splitlines()]
-
-    print("Real:")
-    if p1_theirs == p1_mine:
-        aocd.submit(p1(lines), part="a", day=int(day), year=int(year))
-    if p2_theirs == p2_mine:
-        aocd.submit(p2(lines), part="b", day=int(day), year=int(year))
+    main(p1, p2, 46, 51)
