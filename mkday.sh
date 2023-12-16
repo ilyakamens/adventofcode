@@ -7,18 +7,16 @@ fi
 
 pyfile="src/$1/$2.py"
 
-touch $pyfile "src/$1/input/$2.txt"
+touch $pyfile
 chmod a+x $pyfile
 cat > $pyfile <<EOL
 #!/usr/bin/env python
 
 """https://adventofcode.com/$1/day/$2."""
 
-from os.path import abspath, dirname, join
 import sys
 
-# NOTE: Local imports must come after this.
-sys.path.append(dirname(dirname(abspath(__file__))))
+import aocd
 
 
 def p1(lines):
@@ -30,9 +28,11 @@ def p2(lines):
 
 
 if __name__ == "__main__":
-    with open(join(dirname(__file__), "input", "$2.txt")) as f:
-        lines = f.read().splitlines()
+    year, day, path = sys.argv[1:]
 
-    print(f"Part 1: {p1(lines)}")
-    print(f"Part 2: {p2(lines)}")
+    with open(path) as f:
+        lines = [list(l) for l in f.read().splitlines()]
+
+    aocd.submit(p1(lines), part="a", day=int(day), year=int(year))
+    aocd.submit(p2(lines), part="b", day=int(day), year=int(year))
 EOL

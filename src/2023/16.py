@@ -5,10 +5,9 @@
 from collections import defaultdict
 import copy
 from dataclasses import dataclass
-from os.path import abspath, dirname, join
 import sys
 
-sys.path.append(dirname(dirname(abspath(__file__))))
+import aocd
 
 
 @dataclass
@@ -89,8 +88,10 @@ def p2(lines):
 
 
 if __name__ == "__main__":
-    with open(join(dirname(__file__), "input", "16.txt")) as f:
+    year, day, path = sys.argv[1:]
+
+    with open(path) as f:
         lines = [list(l) for l in f.read().splitlines()]
 
-    print(f"Part 1: {p1(lines)}")
-    print(f"Part 2: {p2(lines)}")
+    aocd.submit(p1(lines), part="a", day=int(day), year=int(year))
+    aocd.submit(p2(lines), part="b", day=int(day), year=int(year))

@@ -15,3 +15,7 @@ license = {text = "MIT"}
 
 [tool.pdm]
 package-type = "application"
+
+
+[tool.pdm.scripts]
+solve = "python -m aocli"
