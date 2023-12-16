@@ -17,6 +17,7 @@ cat > $pyfile <<EOL
 from os.path import abspath, dirname, join
 import sys
 
+# NOTE: Local imports must come after this.
 sys.path.append(dirname(dirname(abspath(__file__))))
 
 
