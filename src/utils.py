@@ -1,4 +1,5 @@
-from collections.abc import Iterable, deque
+import collections
+from collections.abc import Iterable
 from itertools import islice
 from typing import TypeVar
 
@@ -35,7 +36,7 @@ def flip_rows_cols(lines: list[str] | list[list[str]] | list[list[int]]) -> list
 def sliding_window(iterable: Iterable[T], n: int) -> Iterable[Iterable[T]]:
     """sliding_window('ABCDEFG', 4) --> ABCD BCDE CDEF DEFG."""
     it = iter(iterable)
-    window = deque(islice(it, n), maxlen=n)
+    window = collections.deque(islice(it, n), maxlen=n)
     if len(window) == n:
         yield tuple(window)
     for x in it:
