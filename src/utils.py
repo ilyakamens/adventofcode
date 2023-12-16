@@ -1,4 +1,4 @@
-from collections.abc import Iterable, Sequence, deque
+from collections.abc import Iterable, deque
 from itertools import islice
 from typing import TypeVar
 
@@ -18,9 +18,17 @@ def rotate_ccw(matrix):
     return [list(l) for l in list(zip(*matrix[::-1]))]
 
 
-# Taken from Zak.
-def flip_rows_cols(lines: Sequence[str]) -> list[str]:
-    return ["".join(x).strip() for x in zip(*lines)]
+# Modified from Zak's.
+def flip_rows_cols(lines: list[str] | list[list[str]] | list[list[int]]) -> list[str]:
+    flipped = []
+
+    for x in zip(*lines):
+        if isinstance(lines[0], str):
+            flipped.append("".join(x).strip())
+        elif isinstance(lines[0], list):
+            flipped.append(list(x))
+
+    return flipped
 
 
 # Taken from Zak.
