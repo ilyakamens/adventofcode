@@ -1,7 +1,21 @@
 {
-  "python.formatting.provider": "black",
-  "black-formatter.args": [
+    "[python]": {
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        },
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
+    },
+    "black-formatter.args": [
         "--line-length=100",
         "--target-version=py310"
     ],
+    "editor.rulers": [100],
+    "files.exclude": {
+        "**/__pycache__": true,
+        ".venv": true,
+        ".pdm-python": true,
+        "pdm.lock": true,
+    },
+    "isort.args": ["--profile", "black"],
 }
