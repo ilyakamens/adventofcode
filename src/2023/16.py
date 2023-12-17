@@ -87,4 +87,4 @@ def p2(lines):
 
 
 if __name__ == "__main__":
-    main(p1, p2, 46, 51)
+    main(p1, p2, [47], [51])
