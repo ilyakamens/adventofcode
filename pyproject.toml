@@ -12,10 +12,8 @@ requires-python = "==3.10.*"
 readme = "README.md"
 license = {text = "MIT"}
 
-
 [tool.pdm]
 package-type = "application"
-
 
 [tool.pdm.scripts]
 solve = "python -m aocli"
