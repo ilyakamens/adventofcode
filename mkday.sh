@@ -5,6 +5,8 @@ if [[ $# -lt 2 ]]; then
     exit 1
 fi
 
+mkdir -p src/$1
+
 pyfile="src/$1/$2.py"
 
 touch $pyfile
