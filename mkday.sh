@@ -1,5 +1,7 @@
 #!/usr/bin/env zsh
 
+# https://stackoverflow.com/a/11130324/814589
+
 if [[ $# -lt 2 ]]; then
     echo "Example usage: ./mkday.sh 2020 01"
     exit 1
@@ -14,16 +16,16 @@ chmod a+x $pyfile
 cat > $pyfile <<EOL
 #!/usr/bin/env python
 
-"""https://adventofcode.com/$1/day/$2."""
+"""https://adventofcode.com/$1/day/$((10#$2))."""
 
 from main import main
 
 
-def p1(lines):
+def p1(input):
     pass
 
 
-def p2(lines):
+def p2(input):
     pass
 
 

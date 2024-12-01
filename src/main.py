@@ -1,6 +1,6 @@
-from collections.abc import Callable
 import os
 import sys
+from collections.abc import Callable
 
 import aocd
 from rich.align import Align
@@ -13,9 +13,11 @@ def _format_result(result, expected):
     return (
         f"[green]{result}[/green]"
         if result == expected
-        else f"[yellow]{result}[/yellow]"
-        if expected is None
-        else f"[red]{result}[/red] != [green]{expected}[/green]"
+        else (
+            f"[yellow]{result}[/yellow]"
+            if expected is None
+            else f"[red]{result}[/red] != [green]{expected}[/green]"
+        )
     )
 
 
@@ -49,22 +51,22 @@ def main(
         if not os.path.exists(example_path):
             break
         with open(example_path) as f:
-            lines = [list(l) for l in f.read().splitlines()]
-        p1_mines.append(p1(lines))
-        p2_mines.append(p2(lines))
+            example_input = f.read()
+        p1_mines.append(p1(example_input))
+        p2_mines.append(p2(example_input))
         i += 1
 
     _print_rich(zip(p1_mines, p1_theirs), zip(p2_mines, p2_theirs))
 
     with open(path + "/input.txt") as f:
-        lines = [list(l) for l in f.read().splitlines()]
+        input = f.read()
 
     print("Real:")
     if p1_theirs == p1_mines:
-        aocd.submit(p1(lines), part="a", day=int(day), year=int(year))
+        aocd.submit(p1(input), part="a", day=int(day), year=int(year))
     else:
         print("(Part a skipped.)")
     if p2_theirs == p2_mines:
-        aocd.submit(p2(lines), part="b", day=int(day), year=int(year))
+        aocd.submit(p2(input), part="b", day=int(day), year=int(year))
     else:
         print("(Part b skipped.)")
