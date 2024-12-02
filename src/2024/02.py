@@ -33,10 +33,6 @@ def p2(input):
     count = 0
     for report in lines:
         r = numbers(report)
-        if is_safe(r):
-            count += 1
-            continue
-
         for i in range(len(r)):
             if is_safe(r[:i] + r[i + 1 :]):
                 count += 1
