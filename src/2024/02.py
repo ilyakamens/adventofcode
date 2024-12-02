@@ -3,29 +3,24 @@
 """https://adventofcode.com/2024/day/2."""
 
 from main import main
-from utils import sliding_window
+from utils import numbers, sliding_window
 
 
 def p1(input):
     lines = input.splitlines()
     count = 0
     for report in lines:
-        r = [int(x) for x in report.split()]
-        count += int(is_safe(r))
+        count += int(is_safe(numbers(report)))
 
     return count
 
 
 def is_safe(report):
-    decreasing = None
+    decreasing = report[0] > report[1]
     for a, b in sliding_window(report, 2):
-        if a == b:
+        if decreasing and not a > b:
             return False
-        if decreasing is None:
-            decreasing = a > b
-        if not decreasing and a > b:
-            return False
-        if decreasing and b > a:
+        if not decreasing and not b > a:
             return False
         if abs(a - b) > 3:
             return False
@@ -37,14 +32,15 @@ def p2(input):
     lines = input.splitlines()
     count = 0
     for report in lines:
-        r = [int(x) for x in report.split()]
+        r = numbers(report)
         if is_safe(r):
             count += 1
-        else:
-            for i in range(len(r)):
-                if is_safe(r[:i] + r[i + 1 :]):
-                    count += 1
-                    break
+            continue
+
+        for i in range(len(r)):
+            if is_safe(r[:i] + r[i + 1 :]):
+                count += 1
+                break
 
     return count
 

@@ -3,7 +3,11 @@ from collections.abc import Iterable
 from itertools import islice
 from typing import TypeVar
 
-T = TypeVar("T")
+T = TypeVar('T')
+
+
+def numbers(line: str) -> list[int]:
+    return [int(x) for x in line.split()]
 
 
 def chunks(list, size):
@@ -25,7 +29,7 @@ def flip_rows_cols(lines: list[str] | list[list[str]] | list[list[int]]) -> list
 
     for x in zip(*lines):
         if isinstance(lines[0], str):
-            flipped.append("".join(x).strip())
+            flipped.append(''.join(x).strip())
         elif isinstance(lines[0], list):
             flipped.append(list(x))
 
