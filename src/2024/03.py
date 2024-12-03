@@ -6,15 +6,13 @@ import re
 
 from main import main
 
-pattern = r'mul\((\d+),(\d+)\)'
+mul_re = r'mul\((\d{1,3}),(\d{1,3})\)'
 
 
 def p1(input):
     sums = 0
-    matches = re.finditer(pattern, input)
-    for match in matches:
-        l, r = match.group().split(',')
-        sums += int(l.replace('mul(', '')) * int(r.replace(')', ''))
+    for match in re.findall(mul_re, input):
+        sums += int(match[0]) * int(match[1])
 
     return sums
 
@@ -22,26 +20,31 @@ def p1(input):
 def p2(input):
     sums = 0
     do = True
-    i = 1
+    i = 0
+    do_re = re.compile(r'do\(\)')
+    dont_re = re.compile(r"don't\(\)")
+
     while i < len(input):
-        if input[i - 4 : i] == 'do()':
-            print('do', i)
+        if do_re.match(input[i : i + 4]):
+            i += 4
             do = True
-        elif input[i - 7 : i] == "don't()":
-            print('dont', i)
+            continue
+        if dont_re.match(input[i : i + 7]):
+            i += 7
             do = False
+            continue
         if not do:
-            i += 1
+            do_i = input[i:].find('do()')
+            if do_i == -1:
+                break
+            i += do_i
             continue
 
-        if input[i - 4 : i] == 'mul(':
-            print('mul', i, input[i - 4 : i + 9])
-            matches = re.finditer(pattern, input[i - 4 : i + 9])
-            for match in matches:
-                l, r = match.group().split(',')
-                sums += int(l.replace('mul(', '')) * int(r.replace(')', ''))
-                i += match.end() - 5
-                break
+        match = re.match(mul_re, input[i : i + 12])
+        if match:
+            sums += int(match.group(1)) * int(match.group(2))
+            i += match.end()
+            continue
 
         i += 1
 
@@ -49,4 +52,4 @@ def p2(input):
 
 
 if __name__ == '__main__':
-    main(p1, p2, [161], [161])
+    main(p1, p2, [161, 161], [161, 48])
