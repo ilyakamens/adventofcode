@@ -14,7 +14,7 @@ def p1(run: run_type, input: str) -> int:
     g = Grid(input)
 
     count = 0
-    for x, y in g.iter():
+    for x, y in g.findall('X'):
         for dir in Dir8.iter():
             if g.substr(x, y, dir, 4) == 'XMAS':
                 count += 1
@@ -26,7 +26,7 @@ def p2(run: run_type, input: str) -> int:
     g = Grid(input)
 
     count = 0
-    for x, y in g.iter():
+    for x, y in g.findall('A'):
         if all(
             g.substr(x, y, dir, 3, offset=-1) in {'MAS', 'SAM'} for dir in [DirDiag.NE, DirDiag.SE]
         ):

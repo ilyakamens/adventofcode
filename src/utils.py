@@ -100,6 +100,15 @@ class Grid:
             for x in range(len(self.m[y])):
                 yield x, y
 
+    # Inspired by zakj.
+    def findall(self, value: T) -> list[tuple[int, int]]:
+        coords = []
+        for x, y in self.iter():
+            if self[x][y] == value:
+                coords.append((x, y))
+
+        return coords
+
     def substr(self, x: int, y: int, dir: Dir | DirDiag | Dir8, length: int, offset=0):
         dirx, diry = dir
 
