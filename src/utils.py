@@ -117,3 +117,41 @@ class Grid:
             s += self[x + (i * dirx) + (offset * dirx)][y + (i * diry) + (offset * diry)]
 
         return s
+
+    def rotate_cw(self) -> 'Grid':
+        height = len(self.m[0])
+        width = len(self.m)
+
+        rotated = Grid('')
+        for y in range(height):
+            for x in range(width):
+                rotated.m[y][width - 1 - x] = self.m[x][y]
+
+        self.m = rotated.m
+
+    def rotate_ccw(self) -> 'Grid':
+        height = len(self.m[0])
+        width = len(self.m)
+
+        rotated = Grid('')
+        for y in range(height):
+            for x in range(width):
+                rotated.m[height - 1 - y][x] = self.m[x][y]
+
+        self.m = rotated.m
+
+    def __eq__(self, other: 'Grid') -> bool:
+        return self.m == other.m
+
+    def __str__(self) -> str:
+        if not self.m:
+            return ''
+
+        rows = []
+        for y in range(len(self.m)):
+            row = ''
+            for x in range(len(self.m[0])):
+                row += str(self.m[x][y])
+            rows.append(row)
+
+        return '\n'.join(rows) + '\n'
