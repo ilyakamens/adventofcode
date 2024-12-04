@@ -25,7 +25,7 @@ def rotate_ccw(matrix):
     return [list(l) for l in list(zip(*matrix[::-1]))]
 
 
-# Modified from Zak's.
+# Modified from zakj's.
 def flip_rows_cols(lines: list[str] | list[list[str]] | list[list[int]]) -> list[str]:
     flipped = []
 
@@ -139,6 +139,28 @@ class Grid:
                 rotated.m[height - 1 - y][x] = self.m[x][y]
 
         self.m = rotated.m
+
+    def flip_x(self) -> 'Grid':
+        width = len(self.m)
+        height = len(self.m[0])
+
+        flipped = Grid('')
+        for y in range(height):
+            for x in range(width):
+                flipped.m[width - 1 - x][y] = self.m[x][y]
+
+        self.m = flipped.m
+
+    def flip_y(self) -> 'Grid':
+        width = len(self.m)
+        height = len(self.m[0])
+
+        flipped = Grid('')
+        for y in range(height):
+            for x in range(width):
+                flipped.m[x][height - 1 - y] = self.m[x][y]
+
+        self.m = flipped.m
 
     def __eq__(self, other: 'Grid') -> bool:
         return self.m == other.m
