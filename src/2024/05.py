@@ -2,66 +2,51 @@
 
 """https://adventofcode.com/2024/day/5."""
 
-from collections import defaultdict
 from functools import cmp_to_key
-from itertools import combinations
+from typing import Callable
 
 from main import main, runs
+from utils import numbers, paras
 
 
-def gen_rules(input: str) -> list[str]:
-    must_be_after = defaultdict(set)
-    must_be_before = defaultdict(set)
+def gen_rules(input: str) -> tuple[set[tuple[str, str]], Callable[[str, str], int]]:
+    rules = {tuple(line.split('|')) for line in input.splitlines()}
 
-    for line in input.splitlines():
-        before, after = line.split('|')
-        must_be_after[before].add(after)
-        must_be_before[after].add(before)
+    @cmp_to_key
+    def key(a, b):
+        if (a, b) in rules:
+            return -1
+        if (b, a) in rules:
+            return 1
 
-    return must_be_before, must_be_after
+        return 0
 
-
-def is_valid(must_be_before, must_be_after, nums: list[str]) -> bool:
-    for x, y in combinations(nums, 2):
-        if x in must_be_after[y] or y in must_be_before[x]:
-            return False
-
-    return True
+    return rules, key
 
 
 @runs(cases={'1'})
 def p1(input: str) -> int:
-    first, second = input.split('\n\n')
-    must_be_before, must_be_after = gen_rules(first)
+    rules, updates = paras(input)
+    rules, key = gen_rules(rules)
 
     middle_sum = 0
-    for line in second.splitlines():
-        nums = line.split(',')
-        if is_valid(must_be_before, must_be_after, nums):
-            middle_sum += int(nums[len(nums) // 2])
+    for line in updates.splitlines():
+        nums = numbers(line, cast=False)
+        middle_sum += int(nums[len(nums) // 2]) if sorted(nums, key=key) == nums else 0
 
     return middle_sum
 
 
 @runs(cases={'1'})
 def p2(input: str) -> int:
-    first, second = input.split('\n\n')
-    must_be_before, must_be_after = gen_rules(first)
-
-    def key(a, b):
-        if a in must_be_after[b]:
-            return -1
-        if b in must_be_before[a]:
-            return 1
-
-        return 0
+    rules, updates = paras(input)
+    rules, key = gen_rules(rules)
 
     middle_sum = 0
-    for line in second.splitlines():
-        nums = line.split(',')
-        if not is_valid(must_be_before, must_be_after, nums):
-            nums.sort(key=cmp_to_key(key))
-            middle_sum += int(nums[len(nums) // 2])
+    for line in updates.splitlines():
+        nums = numbers(line, cast=False)
+        sorted_nums = sorted(nums, key=key)
+        middle_sum += int(sorted_nums[len(nums) // 2]) if sorted_nums != nums else 0
 
     return middle_sum
 

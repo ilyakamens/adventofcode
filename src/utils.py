@@ -1,3 +1,4 @@
+import re
 from collections import defaultdict, deque
 from collections.abc import Iterable
 from itertools import islice
@@ -7,9 +8,17 @@ T = TypeVar('T')
 
 Vector = tuple[int, int]
 
+int_re = re.compile(r'[-+]?\d+')
 
-def numbers(line: str) -> list[int]:
-    return [int(x) for x in line.split()]
+
+# Inspired by zakj.
+def paras(input: str) -> list[str]:
+    return [x.strip() for x in input.split('\n\n')]
+
+
+# Inspired by zakj.
+def numbers(line: str, cast=True) -> list[int]:
+    return [int(x) if cast else x for x in int_re.findall(line)]
 
 
 def chunks(list, size):
