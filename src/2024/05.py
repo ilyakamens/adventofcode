@@ -9,7 +9,7 @@ from main import main, runs
 from utils import numbers, paras
 
 
-def gen_rules(input: str) -> tuple[set[tuple[str, str]], Callable[[str, str], int]]:
+def gen_key(input: str) -> tuple[set[tuple[str, str]], Callable[[str, str], int]]:
     rules = {tuple(line.split('|')) for line in input.splitlines()}
 
     @cmp_to_key
@@ -21,13 +21,13 @@ def gen_rules(input: str) -> tuple[set[tuple[str, str]], Callable[[str, str], in
 
         return 0
 
-    return rules, key
+    return key
 
 
 @runs(cases={'1'})
 def p1(input: str) -> int:
     rules, updates = paras(input)
-    rules, key = gen_rules(rules)
+    key = gen_key(rules)
 
     middle_sum = 0
     for line in updates.splitlines():
@@ -40,7 +40,7 @@ def p1(input: str) -> int:
 @runs(cases={'1'})
 def p2(input: str) -> int:
     rules, updates = paras(input)
-    rules, key = gen_rules(rules)
+    key = gen_key(rules)
 
     middle_sum = 0
     for line in updates.splitlines():
