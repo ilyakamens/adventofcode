@@ -1,6 +1,7 @@
 import os
 import sys
 from collections.abc import Callable
+from functools import wraps
 
 import aocd
 from rich.align import Align
@@ -70,3 +71,15 @@ def main(
         aocd.submit(p2('real', input), part='b', day=int(day), year=int(year))
     else:
         print('(Part b skipped.)')
+
+
+def runs(cases={'1', 'real'}):
+    def inner(f):
+        @wraps(f)
+        def wrapper(case, *args, **kwargs):
+            if case in cases:
+                return f(case, *args, **kwargs)
+
+        return wrapper
+
+    return inner
