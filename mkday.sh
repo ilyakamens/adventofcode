@@ -20,19 +20,20 @@ cat > $pyfile <<EOL
 
 from typing import Annotated
 
-from main import main
+from main import main, runs
 
 run_type = Annotated[str, '1, 2, 3, etc., or real']
 
 
+@runs(cases={'1', 'real'})
 def p1(run: run_type, input: str) -> int:
     pass
 
-
+@runs(cases={'1', 'real'})
 def p2(run: run_type, input: str) -> int:
     pass
 
 
 if __name__ == '__main__':
-    main(p1, p2, [], [])
+    main(p1, p2, [None], [None])
 EOL

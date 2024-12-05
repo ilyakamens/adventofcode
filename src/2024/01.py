@@ -2,7 +2,7 @@
 
 """https://adventofcode.com/2024/day/1."""
 
-from main import main
+from main import main, runs
 
 
 def parse_input(input):
@@ -14,7 +14,8 @@ def parse_input(input):
     return l1, l2
 
 
-def p1(input):
+@runs(cases={'1'})
+def p1(input: str) -> int:
     l1, l2 = parse_input(input)
 
     l1.sort()
@@ -23,7 +24,8 @@ def p1(input):
     return sum(abs(v2 - v1) for v1, v2 in zip(l1, l2))
 
 
-def p2(input):
+@runs(cases={'1'})
+def p2(input: str) -> int:
     l1, l2 = parse_input(input)
 
     return sum(v * l2.count(v) for v in l1)

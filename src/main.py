@@ -2,6 +2,7 @@ import os
 import sys
 from collections.abc import Callable
 from functools import wraps
+from typing import Annotated
 
 import aocd
 from rich.align import Align
@@ -73,12 +74,11 @@ def main(
         print('(Part b skipped.)')
 
 
-def runs(cases={'1', 'real'}):
+def runs(cases: Annotated[set[str], '(Example input) 1, 2, 3, etc.']):
     def inner(f):
         @wraps(f)
         def wrapper(case, *args, **kwargs):
-            if case in cases:
-                return f(case, *args, **kwargs)
+            return f(*args, **kwargs) if case in cases | {'real'} else None
 
         return wrapper
 

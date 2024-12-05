@@ -4,13 +4,14 @@
 
 from typing import Annotated
 
-from main import main
+from main import main, runs
 from utils import Dir8, DirDiag, Grid
 
 run_type = Annotated[str, '1, 2, 3, etc., or real']
 
 
-def p1(run: run_type, input: str) -> int:
+@runs(cases={'1'})
+def p1(input: str) -> int:
     g = Grid(input)
 
     count = 0
@@ -22,7 +23,8 @@ def p1(run: run_type, input: str) -> int:
     return count
 
 
-def p2(run: run_type, input: str) -> int:
+@runs(cases={'1'})
+def p2(input: str) -> int:
     g = Grid(input)
 
     count = 0

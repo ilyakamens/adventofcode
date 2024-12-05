@@ -2,11 +2,12 @@
 
 """https://adventofcode.com/2024/day/2."""
 
-from main import main
+from main import main, runs
 from utils import numbers, sliding_window
 
 
-def p1(input):
+@runs(cases={'1'})
+def p1(input: str) -> int:
     lines = input.splitlines()
     count = 0
     for report in lines:
@@ -28,7 +29,8 @@ def is_safe(report):
     return True
 
 
-def p2(input):
+@runs(cases={'1'})
+def p2(input: str) -> int:
     lines = input.splitlines()
     count = 0
     for report in lines:
