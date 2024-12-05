@@ -4,71 +4,66 @@
 
 from collections import defaultdict
 from functools import cmp_to_key
+from itertools import combinations
 
 from main import main, runs
 
 
-@runs(cases={'1'})
-def p1(input: str) -> int:
+def gen_rules(input: str) -> list[str]:
     must_be_after = defaultdict(set)
     must_be_before = defaultdict(set)
 
-    first, second = input.split('\n\n')
-    for line in first.splitlines():
+    for line in input.splitlines():
         before, after = line.split('|')
         must_be_after[before].add(after)
         must_be_before[after].add(before)
 
-    middle_nums = []
+    return must_be_before, must_be_after
+
+
+def is_valid(must_be_before, must_be_after, nums: list[str]) -> bool:
+    for x, y in combinations(nums, 2):
+        if x in must_be_after[y] or y in must_be_before[x]:
+            return False
+
+    return True
+
+
+@runs(cases={'1'})
+def p1(input: str) -> int:
+    first, second = input.split('\n\n')
+    must_be_before, must_be_after = gen_rules(first)
+
+    middle_sum = 0
     for line in second.splitlines():
         nums = line.split(',')
-        for i, x in enumerate(nums):
-            for j, y in enumerate(nums[i + 1 :]):
-                if x in must_be_after[y] or y in must_be_before[x]:
-                    break
-            else:
-                continue
-            break
-        else:
-            middle_nums.append(nums[len(nums) // 2])
+        if is_valid(must_be_before, must_be_after, nums):
+            middle_sum += int(nums[len(nums) // 2])
 
-    return sum((int(x) for x in middle_nums))
+    return middle_sum
 
 
 @runs(cases={'1'})
 def p2(input: str) -> int:
-    must_be_after = defaultdict(set)
-    must_be_before = defaultdict(set)
-
     first, second = input.split('\n\n')
-    for line in first.splitlines():
-        before, after = line.split('|')
-        must_be_after[before].add(after)
-        must_be_before[after].add(before)
+    must_be_before, must_be_after = gen_rules(first)
 
-    def sorter(a, b):
+    def key(a, b):
         if a in must_be_after[b]:
             return -1
         if b in must_be_before[a]:
             return 1
+
         return 0
 
-    middle_nums = []
+    middle_sum = 0
     for line in second.splitlines():
         nums = line.split(',')
-        for i, x in enumerate(nums):
-            for j, y in enumerate(nums[i + 1 :]):
-                if x in must_be_after[y] or y in must_be_before[x]:
-                    nums.sort(key=cmp_to_key(sorter))
-                    middle_nums.append(nums[len(nums) // 2])
-                    break
-            else:
-                continue
-            break
-        else:
-            continue
+        if not is_valid(must_be_before, must_be_after, nums):
+            nums.sort(key=cmp_to_key(key))
+            middle_sum += int(nums[len(nums) // 2])
 
-    return sum((int(x) for x in middle_nums))
+    return middle_sum
 
 
 if __name__ == '__main__':
