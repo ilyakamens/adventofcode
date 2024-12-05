@@ -78,7 +78,7 @@ def runs(cases: Annotated[set[str], '(Example input) 1, 2, 3, etc.']):
     def inner(f):
         @wraps(f)
         def wrapper(case, *args, **kwargs):
-            return f(*args, **kwargs) if case in cases | {'real'} else None
+            return f(*args, **kwargs, case=case) if case in cases | {'real'} else None
 
         return wrapper
 

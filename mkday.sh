@@ -22,12 +22,12 @@ from main import main, runs
 
 
 @runs(cases={'1'})
-def p1(input: str) -> int:
+def p1(input: str, case: str) -> int:
     pass
 
 
 @runs(cases={'1'})
-def p2(input: str) -> int:
+def p2(input: str, case: str) -> int:
     pass
 
 
