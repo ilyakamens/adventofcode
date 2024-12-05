@@ -109,6 +109,28 @@ class Grid:
             for x in range(len(self.m[y])):
                 yield x, y
 
+    def corner(self, dir: DirDiag) -> tuple[int, int]:
+        if dir == DirDiag.NW:
+            return 0, 0
+        if dir == DirDiag.NE:
+            return len(self.m) - 1, 0
+        if dir == DirDiag.SE:
+            return len(self.m) - 1, len(self.m[0]) - 1
+        if dir == DirDiag.SW:
+            return 0, len(self.m[0]) - 1
+
+    def corners(self) -> set[tuple[int, int]]:
+        return {self.corner(dir) for dir in DirDiag.iter()}
+
+    def neighbors(self, x: int, y: int, dir=Dir8) -> list[tuple[int, int]]:
+        neighbors = []
+        for dx, dy in dir.iter():
+            nx, ny = x + dx, y + dy
+            if nx in self.m and ny in self.m[nx]:
+                neighbors.append((nx, ny))
+
+        return neighbors
+
     # Inspired by zakj.
     def findall(self, value: T) -> list[tuple[int, int]]:
         coords = []
