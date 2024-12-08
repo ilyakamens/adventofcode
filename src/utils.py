@@ -104,6 +104,9 @@ class Grid:
     def __getitem__(self, x: int) -> dict[int, T]:
         return self.m[x]
 
+    def __contains__(self, x: int) -> bool:
+        return x in self.m
+
     def iter(self):
         for y in range(len(self.m)):
             for x in range(len(self.m[y])):
