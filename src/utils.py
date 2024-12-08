@@ -1,7 +1,8 @@
 import re
 from collections import defaultdict, deque
 from collections.abc import Iterable
-from itertools import islice
+from itertools import combinations, islice
+from math import prod
 from typing import Iterator, TypeVar
 
 T = TypeVar('T')
@@ -9,6 +10,31 @@ T = TypeVar('T')
 Vector = tuple[int, int]
 
 int_re = re.compile(r'[-+]?\d+')
+
+
+def prime_factors(n):
+    factors = []
+    d = 2
+    while d * d <= n:
+        while (n % d) == 0:
+            factors.append(d)
+            n //= d
+        d += 1
+    if n > 1:
+        factors.append(n)
+
+    return factors
+
+
+def divisors(n):
+    factors = prime_factors(n)
+
+    divisors = set()
+    for i in range(1, len(factors) + 1):
+        for c in combinations(factors, i):
+            divisors.add(prod(c))
+
+    return divisors
 
 
 # Inspired by zakj.
