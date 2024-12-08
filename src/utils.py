@@ -107,6 +107,9 @@ class Grid:
     def __contains__(self, x: int) -> bool:
         return x in self.m
 
+    def contains(self, x, y):
+        return x in self.m and y in self.m[x]
+
     def iter(self):
         for y in range(len(self.m)):
             for x in range(len(self.m[y])):
