@@ -1,9 +1,10 @@
 import re
 from collections import defaultdict, deque
 from collections.abc import Iterable
+from dataclasses import dataclass
 from itertools import combinations, islice
 from math import prod
-from typing import Iterator, TypeVar
+from typing import Generic, Iterator, TypeVar
 
 T = TypeVar('T')
 
@@ -240,3 +241,105 @@ class Grid:
             rows.append(row)
 
         return '\n'.join(rows) + '\n'
+
+
+@dataclass
+class Node(Generic[T]):
+    val: T
+    prev: 'Node' = None
+    next: 'Node' = None
+
+    def __str__(self) -> str:
+        return str(self.val)
+
+    def __repr__(self) -> str:
+        return f'Node({self.val})'
+
+
+class LL(Generic[T]):
+    """Doubly linked list."""
+
+    def __init__(self):
+        self.head: Node | None = None
+        self.tail: Node | None = None
+        self.size = 0
+
+    def append(self, val: T):
+        new_node = Node(val)
+        self.size += 1
+
+        if not self.head:
+            self.head = self.tail = new_node
+            return
+
+        new_node.prev = self.tail
+        self.tail.next = new_node
+        self.tail = new_node
+
+    def prepend(self, val: T):
+        new_node = Node(val)
+        self.size += 1
+
+        if not self.head:
+            self.head = self.tail = new_node
+            return
+
+        new_node.next = self.head
+        self.head.prev = new_node
+        self.head = new_node
+
+    def insert(self, val: T, after: Node):
+        if after == self.tail:
+            self.append(val)
+            return
+
+        new_node = Node(val)
+        new_node.next = after.next
+        new_node.prev = after
+        after.next.prev = new_node
+        after.next = new_node
+        self.size += 1
+
+    def remove(self, node: Node):
+        self.size -= 1
+
+        if node == self.head == self.tail:
+            self.head = self.tail = None
+            return
+
+        if node == self.head:
+            self.head = node.next
+            node.next.prev = None
+            return
+
+        if node == self.tail:
+            self.tail = node.prev
+            node.prev.next = None
+            return
+
+        node.prev.next = node.next
+        node.next.prev = node.prev
+
+    def itervals(self):
+        node = self.head
+        while node:
+            yield node.val
+            node = node.next
+
+    def __len__(self):
+        return self.size
+
+    def __iter__(self):
+        node = self.head
+        while node:
+            yield node
+            node = node.next
+
+    def __reversed__(self):
+        node = self.tail
+        while node:
+            yield node
+            node = node.prev
+
+    def __str__(self) -> str:
+        return ' -> '.join(str(x) for x in self)
