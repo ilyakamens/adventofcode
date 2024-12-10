@@ -23,8 +23,9 @@ class Map(Grid):
                     count += 1
                 elif (cx, cy) not in seen:
                     count += 1
-                seen.add((cx, cy))
+                    seen.add((cx, cy))
                 continue
+
             for nx, ny in self.neighbors(cx, cy, dir=Dir):
                 try:
                     neighbor = int(self[nx][ny])
