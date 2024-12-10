@@ -159,7 +159,7 @@ class Grid:
         neighbors = []
         for dx, dy in dir.iter():
             nx, ny = x + dx, y + dy
-            if nx in self.m and ny in self.m[nx]:
+            if self.contains(nx, ny):
                 neighbors.append((nx, ny))
 
         return neighbors
