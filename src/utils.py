@@ -1,5 +1,5 @@
 import re
-from collections import defaultdict, deque
+from collections import defaultdict, deque, namedtuple
 from collections.abc import Iterable
 from dataclasses import dataclass
 from itertools import combinations, islice
@@ -9,6 +9,7 @@ from typing import Generic, Iterator, TypeVar
 T = TypeVar('T')
 
 Vector = tuple[int, int]
+Point = namedtuple('Point', 'x y')
 
 int_re = re.compile(r'[-+]?\d+')
 
@@ -124,61 +125,68 @@ class Grid:
     def __init__(self, input: str, t: str | int = str):
         self.m = defaultdict(lambda: defaultdict(t))
 
-        for y, line in enumerate(input.splitlines()):
+        for y, line in enumerate(input.strip().splitlines()):
             for x, c in enumerate(line):
                 self.m[x][y] = c if t is str else int(c)
 
-    def __getitem__(self, x: int) -> dict[int, T]:
-        return self.m[x]
+    def __getitem__(self, point: Point) -> T:
+        return self.m[point.x][point.y]
 
-    def __contains__(self, x: int) -> bool:
-        return x in self.m
+    def __setitem__(self, point: Point, value: T):
+        self.m[point.x][point.y] = value
 
-    def contains(self, x, y):
-        return x in self.m and y in self.m[x]
+    def __contains__(self, point: Point) -> bool:
+        return point.x in self.m and point.y in self.m[point.x]
 
     def iter(self):
         for y in range(len(self.m)):
             for x in range(len(self.m[y])):
-                yield x, y
+                yield Point(x, y)
 
-    def corner(self, dir: DirDiag) -> tuple[int, int]:
+    def corner(self, dir: DirDiag) -> Point:
         if dir == DirDiag.NW:
-            return 0, 0
+            return Point(0, 0)
         if dir == DirDiag.NE:
-            return len(self.m) - 1, 0
+            return Point(len(self.m) - 1, 0)
         if dir == DirDiag.SE:
-            return len(self.m) - 1, len(self.m[0]) - 1
+            return Point(len(self.m) - 1, len(self.m[0]) - 1)
         if dir == DirDiag.SW:
-            return 0, len(self.m[0]) - 1
+            return Point(0, len(self.m[0]) - 1)
 
-    def corners(self) -> set[tuple[int, int]]:
+    def corners(self) -> set[Point]:
         return {self.corner(dir) for dir in DirDiag.iter()}
 
-    def neighbors(self, x: int, y: int, dir=Dir8) -> list[tuple[int, int]]:
+    def neighbor(self, x: int, y: int, dir=Dir) -> Point:
+        dx, dy = dir
+
+        return Point(x + dx, y + dy)
+
+    def neighbors(self, x: int, y: int, dir=Dir8, allow_out=False) -> list[Point]:
         neighbors = []
         for dx, dy in dir.iter():
             nx, ny = x + dx, y + dy
-            if self.contains(nx, ny):
-                neighbors.append((nx, ny))
+            if (nx, ny) in self or allow_out:
+                neighbors.append(Point(nx, ny))
 
         return neighbors
 
     # Inspired by zakj.
-    def findall(self, value: T) -> list[tuple[int, int]]:
+    def findall(self, value: T) -> list[Point]:
         coords = []
-        for x, y in self.iter():
-            if self[x][y] == value:
-                coords.append((x, y))
+        for point in self.iter():
+            if self[point] == value:
+                coords.append(point)
 
         return coords
 
-    def substr(self, x: int, y: int, dir: Dir | DirDiag | Dir8, length: int, offset=0):
+    def substr(self, point: Point, dir: Dir | DirDiag | Dir8, length: int, offset=0):
         dirx, diry = dir
 
         s = ''
         for i in range(length):
-            s += self[x + (i * dirx) + (offset * dirx)][y + (i * diry) + (offset * diry)]
+            x = point.x + (i * dirx) + (offset * dirx)
+            y = point.y + (i * diry) + (offset * diry)
+            s += self[Point(x, y)]
 
         return s
 
