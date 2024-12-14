@@ -122,6 +122,16 @@ class Dir8(Dir, DirDiag):
 
 
 class Grid:
+    @classmethod
+    def from_dimensions(cls, rows: int, cols: int, default: str = '.') -> 'Grid':
+        s = ''
+        for _ in range(rows):
+            for _ in range(cols):
+                s += default
+            s += '\n'
+
+        return cls(s)
+
     def __init__(self, input: str, t: str | int = str):
         self.m = defaultdict(lambda: defaultdict(t))
 

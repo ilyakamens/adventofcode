@@ -13,7 +13,7 @@ GUID = 0
 
 
 @dataclass
-class R:
+class Robot:
     p: Point
     v: Point
 
@@ -59,24 +59,9 @@ def p1(input: str, case: str) -> int:
     r = set()
     for row in input.splitlines():
         px, py, vx, vy = numbers(row)
-        r.add(R(Point(px, py), Point(vx, vy)))
+        r.add(Robot(Point(px, py), Point(vx, vy)))
 
-    s = ''
-    for _ in range(rows):
-        for _ in range(cols):
-            s += '.'
-        s += '\n'
-
-    for i in range(1_000_000):
-        if case == 'real' and (i - 89) % 101 == 0:
-            grid = Grid(s)
-            for robot in r:
-                grid[robot.p] = '1'
-
-            print(i)
-            print(grid)
-            print()
-            breakpoint()
+    for i in range(100):
         for robot in r:
             robot.move(cols, rows)
 
@@ -89,10 +74,29 @@ def p1(input: str, case: str) -> int:
     return math.prod(counts.values())
 
 
-@runs(cases={'1'})
+@runs(cases=set())
 def p2(input: str, case: str) -> int:
-    return 8270
+    answer = 8270
+
+    rows = 103
+    cols = 101
+    r = set()
+    for row in input.splitlines():
+        px, py, vx, vy = numbers(row)
+        r.add(Robot(Point(px, py), Point(vx, vy)))
+
+    # There's something interesting every (i - 89) % 101 == 0.
+    for _ in range(answer):
+        for robot in r:
+            robot.move(cols, rows)
+
+    grid = Grid.from_dimensions(rows, cols)
+    for robot in r:
+        grid[robot.p] = '1'
+    print(grid)
+
+    return answer
 
 
 if __name__ == '__main__':
-    main(p1, p2, [16], [8270])
+    main(p1, p2, [12], [None])
