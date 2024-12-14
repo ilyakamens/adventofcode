@@ -127,16 +127,16 @@ class Grid:
 
         for y, line in enumerate(input.strip().splitlines()):
             for x, c in enumerate(line):
-                self.m[x][y] = c if t is str else int(c)
+                self[Point(x, y)] = c if t is str else int(c)
 
     def __getitem__(self, point: Point) -> T:
-        return self.m[point.x][point.y]
+        return self.m[point.y][point.x]
 
     def __setitem__(self, point: Point, value: T):
-        self.m[point.x][point.y] = value
+        self.m[point.y][point.x] = value
 
     def __contains__(self, point: Point) -> bool:
-        return point.x in self.m and point.y in self.m[point.x]
+        return point.y in self.m and point.x in self.m[point.y]
 
     def iter(self):
         for y in range(len(self.m)):
@@ -156,17 +156,17 @@ class Grid:
     def corners(self) -> set[Point]:
         return {self.corner(dir) for dir in DirDiag.iter()}
 
-    def neighbor(self, x: int, y: int, dir=Dir) -> Point:
+    def neighbor(self, p: Point, dir=Dir) -> Point:
         dx, dy = dir
 
-        return Point(x + dx, y + dy)
+        return Point(p.x + dx, p.y + dy)
 
-    def neighbors(self, x: int, y: int, dir=Dir8, allow_out=False) -> list[Point]:
+    def neighbors(self, p: Point, dir=Dir8, allow_out=False) -> list[Point]:
         neighbors = []
         for dx, dy in dir.iter():
-            nx, ny = x + dx, y + dy
-            if (nx, ny) in self or allow_out:
-                neighbors.append(Point(nx, ny))
+            dp = Point(p.x + dx, p.y + dy)
+            if dp in self or allow_out:
+                neighbors.append(dp)
 
         return neighbors
 
@@ -245,7 +245,7 @@ class Grid:
         for y in range(len(self.m)):
             row = ''
             for x in range(len(self.m[0])):
-                row += str(self.m[x][y])
+                row += str(self[Point(x, y)])
             rows.append(row)
 
         return '\n'.join(rows) + '\n'
