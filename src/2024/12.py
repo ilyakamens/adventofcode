@@ -52,24 +52,14 @@ class Garden(Grid):
         for p in region:
             for start in range(0, len(directions) - 1, 2):
                 end = start + 3
+                # Side, corner, side.
                 s1, c, s2 = directions[start:end]
-                if (
-                    self.neighbor(p, s1) not in region
-                    and self.neighbor(p, c) not in region
-                    and self.neighbor(p, s2) not in region
-                ):
+                n1, n2, n3 = self.neighbor(p, s1), self.neighbor(p, c), self.neighbor(p, s2)
+                if n1 not in region and n2 not in region and n3 not in region:
                     corners.add((p, s1, c, s2))
-                elif (
-                    self.neighbor(p, s1) in region
-                    and self.neighbor(p, c) not in region
-                    and self.neighbor(p, s2) in region
-                ):
+                elif n1 in region and n2 not in region and n3 in region:
                     corners.add((p, s1, c, s2))
-                elif (
-                    self.neighbor(p, s1) not in region
-                    and self.neighbor(p, c) in region
-                    and self.neighbor(p, s2) not in region
-                ):
+                elif n1 not in region and n2 in region and n3 not in region:
                     corners.add((p, s1, c, s2))
 
         return corners
