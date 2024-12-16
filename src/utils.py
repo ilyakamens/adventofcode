@@ -96,8 +96,18 @@ def sliding_window(iterable: Iterable[T], n: int) -> Iterable[Iterable[T]]:
         yield tuple(window)
 
 
+# Taken from zakj.
+class IterableClass[T](type):
+    @classmethod
+    def iter(cls):
+        raise NotImplementedError
+
+    def __iter__(self) -> Iterator[T]:
+        return self.iter()
+
+
 # Inspired by zakj's.
-class Dir:
+class Dir(metaclass=IterableClass):
     N: Vector = (0, -1)
     E: Vector = (1, 0)
     S: Vector = (0, 1)
@@ -114,7 +124,7 @@ class Dir:
 
 
 # Inspired by zakj's.
-class DirDiag:
+class DirDiag(metaclass=IterableClass):
     NE: Vector = (1, -1)
     SE: Vector = (1, 1)
     SW: Vector = (-1, 1)
@@ -131,7 +141,7 @@ class DirDiag:
 
 
 # Inspired by zakj's.
-class Dir8(Dir, DirDiag):
+class Dir8(Dir, DirDiag, metaclass=IterableClass):
     @classmethod
     def iter(cls) -> Iterator[Vector]:
         for d in [cls.N, cls.NE, cls.E, cls.SE, cls.S, cls.SW, cls.W, cls.NW]:

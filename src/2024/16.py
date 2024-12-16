@@ -26,7 +26,7 @@ class ReindeerGrid(AStarGrid):
     def get_neighbors(self, node: ReindeerNode) -> list[tuple[ReindeerNode, int]]:
         neighbors: list[tuple[ReindeerNode, int]] = []
 
-        for d in Dir.iter():
+        for d in Dir:
             neighbor_pos = self.neighbor(node.p, d)
             if Dir.opposite(node.dir) == d or self[neighbor_pos] == '#':
                 continue
