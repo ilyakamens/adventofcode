@@ -174,12 +174,14 @@ class Grid:
 
     def __init__(self, input: str, t: str | int = str):
         self.m = {}
+        self.width = 0
+        self.height = 0
 
         for y, line in enumerate(input.strip().splitlines()):
             for x, c in enumerate(line):
                 self[(x, y)] = c if t is str else int(c)
-            self.width = x + 1
-        self.height = y + 1
+            self.width = max(self.width, x + 1)
+            self.height = max(self.height, y + 1)
 
     def __getitem__(self, point: Point) -> T:
         return self.m[point]
@@ -245,7 +247,7 @@ class Grid:
 
         return s
 
-    def rotate_cw(self) -> 'Grid':
+    def rotate_ccw(self) -> 'Grid':
         rotated = Grid('')
         for y in range(self.height):
             for x in range(self.width):
@@ -253,7 +255,7 @@ class Grid:
 
         self.m = rotated.m
 
-    def rotate_ccw(self) -> 'Grid':
+    def rotate_cw(self) -> 'Grid':
         rotated = Grid('')
         for y in range(self.height):
             for x in range(self.width):
