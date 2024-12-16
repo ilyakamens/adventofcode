@@ -14,6 +14,10 @@ Point = namedtuple('Point', 'x y')
 int_re = re.compile(r'[-+]?\d+')
 
 
+def manhattan(p1: Point, p2: Point) -> int:
+    return abs(p1.x - p2.x) + abs(p1.y - p2.y)
+
+
 def prime_factors(n):
     factors = []
     d = 2
