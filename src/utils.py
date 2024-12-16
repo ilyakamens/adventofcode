@@ -1,5 +1,6 @@
+import heapq
 import re
-from collections import defaultdict, deque, namedtuple
+from collections import defaultdict, deque
 from collections.abc import Iterable
 from dataclasses import dataclass
 from itertools import combinations, islice
@@ -9,13 +10,17 @@ from typing import Generic, Iterator, TypeVar
 T = TypeVar('T')
 
 Vector = tuple[int, int]
-Point = namedtuple('Point', 'x y')
+Point = tuple[int, int]
 
 int_re = re.compile(r'[-+]?\d+')
 
 
+def sum_tuples(t1: tuple[T, ...], t2: tuple[T, ...]) -> tuple[T, ...]:
+    return tuple(x + y for x, y in zip(t1, t2))
+
+
 def manhattan(p1: Point, p2: Point) -> int:
-    return abs(p1.x - p2.x) + abs(p1.y - p2.y)
+    return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
 
 
 def prime_factors(n):
@@ -103,6 +108,10 @@ class Dir:
         for d in [cls.N, cls.E, cls.S, cls.W]:
             yield d
 
+    @classmethod
+    def opposite(cls, dir: Vector) -> Vector:
+        return {cls.N: cls.S, cls.E: cls.W, cls.S: cls.N, cls.W: cls.E}[dir]
+
 
 # Inspired by zakj's.
 class DirDiag:
@@ -116,6 +125,10 @@ class DirDiag:
         for d in [cls.NE, cls.SE, cls.SW, cls.NW]:
             yield d
 
+    @classmethod
+    def opposite(cls, dir: Vector) -> Vector:
+        return {cls.NE: cls.SW, cls.SE: cls.NW, cls.SW: cls.NE, cls.NW: cls.SE}[dir]
+
 
 # Inspired by zakj's.
 class Dir8(Dir, DirDiag):
@@ -123,6 +136,19 @@ class Dir8(Dir, DirDiag):
     def iter(cls) -> Iterator[Vector]:
         for d in [cls.N, cls.NE, cls.E, cls.SE, cls.S, cls.SW, cls.W, cls.NW]:
             yield d
+
+    @classmethod
+    def opposite(cls, dir: Vector) -> Vector:
+        return {
+            cls.N: cls.S,
+            cls.E: cls.W,
+            cls.S: cls.N,
+            cls.W: cls.E,
+            cls.NE: cls.SW,
+            cls.SE: cls.NW,
+            cls.SW: cls.NE,
+            cls.NW: cls.SE,
+        }[dir]
 
 
 class Grid:
@@ -137,57 +163,62 @@ class Grid:
         return cls(s)
 
     def __init__(self, input: str, t: str | int = str):
-        self.m = defaultdict(lambda: defaultdict(t))
+        self.m = {}
 
         for y, line in enumerate(input.strip().splitlines()):
             for x, c in enumerate(line):
-                self[Point(x, y)] = c if t is str else int(c)
+                self[(x, y)] = c if t is str else int(c)
+            self.width = x + 1
+        self.height = y + 1
 
     def __getitem__(self, point: Point) -> T:
-        return self.m[point.y][point.x]
+        return self.m[point]
 
     def __setitem__(self, point: Point, value: T):
-        self.m[point.y][point.x] = value
+        self.m[point] = value
 
     def __contains__(self, point: Point) -> bool:
-        return point.y in self.m and point.x in self.m[point.y]
+        return point in self.m
 
-    def iter(self):
-        for y in range(len(self.m)):
-            for x in range(len(self.m[y])):
-                yield Point(x, y)
+    def __iter__(self):
+        for y in range(self.height):
+            for x in range(self.width):
+                yield x, y
 
     def corner(self, dir: DirDiag) -> Point:
         if dir == DirDiag.NW:
-            return Point(0, 0)
+            return 0, 0
         if dir == DirDiag.NE:
-            return Point(len(self.m) - 1, 0)
+            return self.width - 1, 0
         if dir == DirDiag.SE:
-            return Point(len(self.m) - 1, len(self.m[0]) - 1)
+            return self.width - 1, self.height - 1
         if dir == DirDiag.SW:
-            return Point(0, len(self.m[0]) - 1)
+            return 0, self.height - 1
 
     def corners(self) -> set[Point]:
         return {self.corner(dir) for dir in DirDiag.iter()}
 
     def neighbor(self, p: Point, dir=Dir) -> Point:
-        dx, dy = dir
-
-        return Point(p.x + dx, p.y + dy)
+        return sum_tuples(p, dir)
 
     def neighbors(self, p: Point, dir=Dir8, allow_out=False) -> list[Point]:
         neighbors = []
-        for dx, dy in dir.iter():
-            dp = Point(p.x + dx, p.y + dy)
-            if dp in self or allow_out:
-                neighbors.append(dp)
+        for d in dir.iter():
+            n = sum_tuples(p, d)
+            if n in self or allow_out:
+                neighbors.append(n)
 
         return neighbors
+
+    def find(self, value: T) -> Point:
+        for point in self:
+            if self[point] == value:
+                return point
 
     # Inspired by zakj.
     def findall(self, value: T) -> list[Point]:
         coords = []
-        for point in self.iter():
+        for point in self:
             if self[point] == value:
                 coords.append(point)
 
@@ -200,51 +231,39 @@ class Grid:
         for i in range(length):
             x = point.x + (i * dirx) + (offset * dirx)
             y = point.y + (i * diry) + (offset * diry)
-            s += self[Point(x, y)]
+            s += self[(x, y)]
 
         return s
 
     def rotate_cw(self) -> 'Grid':
-        height = len(self.m[0])
-        width = len(self.m)
-
         rotated = Grid('')
-        for y in range(height):
-            for x in range(width):
-                rotated.m[y][width - 1 - x] = self.m[x][y]
+        for y in range(self.height):
+            for x in range(self.width):
+                rotated.m[(y, self.width - 1 - x)] = self.m[(x, y)]
 
         self.m = rotated.m
 
     def rotate_ccw(self) -> 'Grid':
-        height = len(self.m[0])
-        width = len(self.m)
-
         rotated = Grid('')
-        for y in range(height):
-            for x in range(width):
-                rotated.m[height - 1 - y][x] = self.m[x][y]
+        for y in range(self.height):
+            for x in range(self.width):
+                rotated.m[(self.height - 1 - y, x)] = self.m[(x, y)]
 
         self.m = rotated.m
 
     def flip_x(self) -> 'Grid':
-        width = len(self.m)
-        height = len(self.m[0])
-
         flipped = Grid('')
-        for y in range(height):
-            for x in range(width):
-                flipped.m[width - 1 - x][y] = self.m[x][y]
+        for y in range(self.height):
+            for x in range(self.width):
+                flipped.m[(self.width - 1 - x, y)] = self.m[(x, y)]
 
         self.m = flipped.m
 
     def flip_y(self) -> 'Grid':
-        width = len(self.m)
-        height = len(self.m[0])
-
         flipped = Grid('')
-        for y in range(height):
-            for x in range(width):
-                flipped.m[x][height - 1 - y] = self.m[x][y]
+        for y in range(self.height):
+            for x in range(self.width):
+                flipped.m[(x, self.height - 1 - y)] = self.m[(x, y)]
 
         self.m = flipped.m
 
@@ -256,13 +275,69 @@ class Grid:
             return ''
 
         rows = []
-        for y in range(len(self.m)):
+        for y in range(self.height):
             row = ''
-            for x in range(len(self.m[0])):
-                row += str(self[Point(x, y)])
+            for x in range(self.width):
+                row += str(self[(x, y)])
             rows.append(row)
 
         return '\n'.join(rows) + '\n'
+
+
+@dataclass
+class AStarNode:
+    grid: 'AStarGrid'
+    p: Point
+
+    def __hash__(self):
+        raise NotImplementedError
+
+    def __lt__(self, other: 'AStarNode'):
+        return self.grid.total_costs[self] < self.grid.total_costs[other]
+
+    def __eq__(self, other: 'AStarNode'):
+        raise NotImplementedError
+
+
+class AStarGrid(Grid):
+    def __init__(self, input: str):
+        super().__init__(input)
+        self.total_costs = defaultdict(lambda: float('inf'))
+        self.came_from = defaultdict(set)
+
+    def heuristic(self, start_pos: Point, end_pos: Point) -> int:
+        raise NotImplementedError
+
+    def get_neighbors(self, node: AStarNode) -> list[tuple[AStarNode, int]]:
+        raise NotImplementedError
+
+    def shortest_path(
+        self, start_node: AStarNode, end_pos: Point
+    ) -> tuple[int, dict[AStarNode, set[AStarNode]], AStarNode]:
+        heap: list[AStarNode] = []
+        heapq.heappush(heap, start_node)
+
+        partial_costs = defaultdict(lambda: float('inf'))
+        partial_costs[start_node] = 0
+
+        self.total_costs[start_node] = self.heuristic(start_node.p, end_pos)
+
+        while heap:
+            cur = heapq.heappop(heap)
+
+            if cur.p == end_pos:
+                self.cost = self.total_costs[cur]
+                self.end = cur
+                return
+
+            for neighbor, cost in self.get_neighbors(cur):
+                partial_cost = partial_costs[cur] + cost
+                if partial_cost <= partial_costs[neighbor]:
+                    self.came_from[neighbor].add(cur)
+                    partial_costs[neighbor] = partial_cost
+                    self.total_costs[neighbor] = partial_cost + self.heuristic(neighbor.p, end_pos)
+                    if neighbor not in heap:
+                        heapq.heappush(heap, neighbor)
 
 
 @dataclass
