@@ -1,7 +1,7 @@
 import heapq
 import re
 from collections import defaultdict, deque
-from collections.abc import Iterable
+from collections.abc import Generator, Iterable
 from dataclasses import dataclass
 from itertools import combinations, islice
 from math import prod
@@ -316,6 +316,7 @@ class AStarGrid(Grid):
         super().__init__(input)
         self.total_costs = defaultdict(lambda: float('inf'))
         self.came_from = defaultdict(set)
+        self.best_total_cost = float('inf')
 
     def heuristic(self, start_pos: Point, end_pos: Point) -> int:
         raise NotImplementedError
@@ -325,7 +326,7 @@ class AStarGrid(Grid):
 
     def shortest_path(
         self, start_node: AStarNode, end_pos: Point
-    ) -> tuple[int, dict[AStarNode, set[AStarNode]], AStarNode]:
+    ) -> Generator[tuple[int, AStarNode]]:
         heap: list[AStarNode] = []
         heapq.heappush(heap, start_node)
 
@@ -338,16 +339,18 @@ class AStarGrid(Grid):
             cur = heapq.heappop(heap)
 
             if cur.p == end_pos:
-                self.cost = self.total_costs[cur]
-                self.end = cur
-                return
+                # NOTE: This won't ever change.
+                self.best_total_cost = self.total_costs[cur]
+                yield cur
+                continue
 
             for neighbor, cost in self.get_neighbors(cur):
                 partial_cost = partial_costs[cur] + cost
-                if partial_cost <= partial_costs[neighbor]:
+                total_cost = partial_cost + self.heuristic(neighbor.p, end_pos)
+                if total_cost <= self.best_total_cost and partial_cost <= partial_costs[neighbor]:
                     self.came_from[neighbor].add(cur)
                     partial_costs[neighbor] = partial_cost
-                    self.total_costs[neighbor] = partial_cost + self.heuristic(neighbor.p, end_pos)
+                    self.total_costs[neighbor] = total_cost
                     if neighbor not in heap:
                         heapq.heappush(heap, neighbor)
 

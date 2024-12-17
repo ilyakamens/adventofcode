@@ -44,23 +44,23 @@ class ReindeerGrid(AStarGrid):
 def p1(input: str, case: str) -> int:
     grid = ReindeerGrid(input)
     start = ReindeerNode(grid, grid.find('S'), Dir.E)
-    grid.shortest_path(start, grid.find('E'))
+    _ = next(grid.shortest_path(start, grid.find('E')))
 
-    return grid.cost
+    return grid.best_total_cost
 
 
 @runs(cases={'1', '2'})
 def p2(input: str, case: str) -> int:
     grid = ReindeerGrid(input)
     start = ReindeerNode(grid, grid.find('S'), Dir.E)
-    grid.shortest_path(start, grid.find('E'))
 
     seen = set()
-    froms = {grid.end}
-    while froms:
-        m = froms.pop()
-        seen.add(m.p)
-        froms.update(grid.came_from[m])
+    for end in grid.shortest_path(start, grid.find('E')):
+        froms = {end}
+        while froms:
+            m = froms.pop()
+            seen.add(m.p)
+            froms.update(grid.came_from[m])
 
     return len(seen)
 
