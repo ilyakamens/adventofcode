@@ -75,27 +75,6 @@ def chunks(list, size):
         yield list[i : i + size]
 
 
-def rotate_cw(matrix):
-    return [list(l) for l in list(zip(*matrix))[::-1]]
-
-
-def rotate_ccw(matrix):
-    return [list(l) for l in list(zip(*matrix[::-1]))]
-
-
-# Modified from zakj's.
-def flip_rows_cols(lines: list[str] | list[list[str]] | list[list[int]]) -> list[str]:
-    flipped = []
-
-    for x in zip(*lines):
-        if isinstance(lines[0], str):
-            flipped.append(''.join(x).strip())
-        elif isinstance(lines[0], list):
-            flipped.append(list(x))
-
-    return flipped
-
-
 # Taken from zakj.
 def sliding_window(iterable: Iterable[T], n: int) -> Iterable[Iterable[T]]:
     """sliding_window('ABCDEFG', 4) --> ABCD BCDE CDEF DEFG."""
