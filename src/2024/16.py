@@ -49,11 +49,7 @@ def p2(input: str) -> int:
 
     seen = set()
     for end in grid.shortest_paths(start, grid.find('E')):
-        froms = {end}
-        while froms:
-            m = froms.pop()
-            seen.add(m.p)
-            froms.update(grid.came_from[m])
+        seen.update(grid.all_path_points(end))
 
     return len(seen)
 

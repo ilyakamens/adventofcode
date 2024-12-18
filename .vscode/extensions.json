@@ -1,3 +1,8 @@
 {
-  "recommendations": ["charliermarsh.ruff", "ms-python.python", "stkb.rewrap"]
+  "recommendations": [
+    "charliermarsh.ruff",
+    "ms-python.python",
+    "stkb.rewrap",
+    "tamasfe.even-better-toml"
+  ]
 }

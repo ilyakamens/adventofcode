@@ -347,7 +347,7 @@ class AStarGrid(Grid):
         start_node: AStarNode,
         end_pos: Point,
         op: Callable[[int, int], bool] = lt,
-    ) -> Generator[tuple[int, AStarNode]]:
+    ) -> Generator[AStarNode]:
         heap: list[AStarNode] = []
         heapq.heappush(heap, start_node)
 
@@ -377,10 +377,19 @@ class AStarGrid(Grid):
                     if neighbor not in heap:
                         heapq.heappush(heap, neighbor)
 
-    def shortest_paths(
-        self, start_node: AStarNode, end_pos: Point
-    ) -> Generator[tuple[int, AStarNode]]:
+    def shortest_paths(self, start_node: AStarNode, end_pos: Point) -> Generator[AStarNode]:
         return self.shortest_path(start_node, end_pos, op=le)
+
+    def all_path_points(self, end: AStarNode) -> set[Point]:
+        seen = set()
+
+        froms = {end}
+        while froms:
+            node = froms.pop()
+            seen.add(node.p)
+            froms.update(self.came_from[node])
+
+        return seen
 
 
 @dataclass
