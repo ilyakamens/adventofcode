@@ -37,7 +37,7 @@ def p2(input: str, size: int, stop: int) -> int:
         grid: MemoryGrid = create_grid(lines, size, i)
         start_node = AStarNode(grid, (0, 0))
         end_pos = (size - 1, size - 1)
-        return next(grid.shortest_path(start_node, end_pos)) is not None
+        return next(grid.shortest_path(start_node, end_pos), None) is not None
 
     return lines[binary_search(shortest_path_exists, stop, len(lines) - 1)]
 

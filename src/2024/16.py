@@ -4,8 +4,8 @@
 
 from dataclasses import dataclass
 
-from main import main, runs
-from utils import AStarGrid, AStarNode, Dir, Point, Vector, manhattan
+from main import main
+from utils import AStarGrid, AStarNode, Dir, Vector
 
 
 @dataclass
@@ -20,42 +20,35 @@ class ReindeerNode(AStarNode):
 
 
 class ReindeerGrid(AStarGrid):
-    def heuristic(self, start_pos: Point, end_pos: Point) -> int:
-        return manhattan(start_pos, end_pos)
+    def cost(self, f: ReindeerNode, t: ReindeerNode) -> int:
+        return 1 if f.dir == t.dir else 1001
 
     def get_neighbors(self, node: ReindeerNode) -> list[tuple[ReindeerNode, int]]:
         neighbors: list[tuple[ReindeerNode, int]] = []
-
-        for d in Dir:
+        for d in self.dir:
             neighbor_pos = self.neighbor(node.p, d)
             if Dir.opposite(node.dir) == d or self[neighbor_pos] == '#':
                 continue
 
-            cost = 1
-            if d != node.dir:
-                cost += 1000
-
-            neighbors.append((ReindeerNode(self, neighbor_pos, d), cost))
+            neighbors.append(ReindeerNode(self, neighbor_pos, d))
 
         return neighbors
 
 
-@runs(cases={'1', '2'})
-def p1(input: str, case: str) -> int:
+def p1(input: str) -> int:
     grid = ReindeerGrid(input)
     start = ReindeerNode(grid, grid.find('S'), Dir.E)
-    _ = next(grid.shortest_path(start, grid.find('E')))
+    next(grid.shortest_path(start, grid.find('E')))
 
     return grid.best_total_cost
 
 
-@runs(cases={'1', '2'})
-def p2(input: str, case: str) -> int:
+def p2(input: str) -> int:
     grid = ReindeerGrid(input)
     start = ReindeerNode(grid, grid.find('S'), Dir.E)
 
     seen = set()
-    for end in grid.shortest_path(start, grid.find('E')):
+    for end in grid.shortest_paths(start, grid.find('E')):
         froms = {end}
         while froms:
             m = froms.pop()
@@ -66,4 +59,4 @@ def p2(input: str, case: str) -> int:
 
 
 if __name__ == '__main__':
-    main(p1, p2, [7036, 11048], [45, 64])
+    main(p1, p2)

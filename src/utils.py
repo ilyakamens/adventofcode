@@ -377,9 +377,7 @@ class AStarGrid(Grid):
                     if neighbor not in heap:
                         heapq.heappush(heap, neighbor)
 
-        yield None
-
-    def all_shortest_paths(
+    def shortest_paths(
         self, start_node: AStarNode, end_pos: Point
     ) -> Generator[tuple[int, AStarNode]]:
         return self.shortest_path(start_node, end_pos, op=le)
