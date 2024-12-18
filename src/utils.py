@@ -1,10 +1,11 @@
 import heapq
 import re
 from collections import defaultdict, deque
-from collections.abc import Generator, Iterable
+from collections.abc import Callable, Generator, Iterable
 from dataclasses import dataclass
 from itertools import combinations, islice
 from math import prod
+from operator import le, lt
 from typing import Generic, Iterator, TypeVar
 
 T = TypeVar('T')
@@ -13,6 +14,17 @@ Vector = tuple[int, int]
 Point = tuple[int, int]
 
 int_re = re.compile(r'[-+]?\d+')
+
+
+def binary_search(f: Callable[[int], bool], low: int, high: int) -> int:
+    while low < high:
+        mid = (low + high) // 2
+        if f(mid):
+            low = mid + 1
+        else:
+            high = mid - 1
+
+    return low
 
 
 def sum_tuples(t1: tuple[T, ...], t2: tuple[T, ...]) -> tuple[T, ...]:
@@ -213,7 +225,7 @@ class Grid:
     def neighbor(self, p: Point, dir=Dir) -> Point:
         return sum_tuples(p, dir)
 
-    def neighbors(self, p: Point, dir=Dir8, allow_out=False) -> list[Point]:
+    def neighbors(self, p: Point, dir=Dir, allow_out=False) -> list[Point]:
         neighbors = []
         for d in dir.iter():
             n = sum_tuples(p, d)
@@ -302,30 +314,39 @@ class AStarNode:
     p: Point
 
     def __hash__(self):
-        raise NotImplementedError
+        return hash(self.p)
 
     def __lt__(self, other: 'AStarNode'):
         return self.grid.total_costs[self] < self.grid.total_costs[other]
 
     def __eq__(self, other: 'AStarNode'):
-        raise NotImplementedError
+        return self.p == other.p
 
 
 class AStarGrid(Grid):
-    def __init__(self, input: str):
+    def __init__(self, input: str, dir: Dir | DirDiag | Dir8 = Dir):
         super().__init__(input)
+
+        self.dir = dir
+
         self.total_costs = defaultdict(lambda: float('inf'))
         self.came_from = defaultdict(set)
         self.best_total_cost = float('inf')
 
     def heuristic(self, start_pos: Point, end_pos: Point) -> int:
-        raise NotImplementedError
+        return manhattan(start_pos, end_pos)
 
-    def get_neighbors(self, node: AStarNode) -> list[tuple[AStarNode, int]]:
-        raise NotImplementedError
+    def cost(self, f: AStarNode, t: AStarNode) -> int:
+        return 1
+
+    def get_neighbors(self, node: AStarNode) -> list[AStarNode]:
+        return [AStarNode(self, p) for p in self.neighbors(node.p, self.dir)]
 
     def shortest_path(
-        self, start_node: AStarNode, end_pos: Point
+        self,
+        start_node: AStarNode,
+        end_pos: Point,
+        op: Callable[[int, int], bool] = lt,
     ) -> Generator[tuple[int, AStarNode]]:
         heap: list[AStarNode] = []
         heapq.heappush(heap, start_node)
@@ -344,15 +365,24 @@ class AStarGrid(Grid):
                 yield cur
                 continue
 
-            for neighbor, cost in self.get_neighbors(cur):
-                partial_cost = partial_costs[cur] + cost
+            for neighbor in self.get_neighbors(cur):
+                if neighbor in self.came_from[cur]:
+                    continue
+                partial_cost = partial_costs[cur] + self.cost(cur, neighbor)
                 total_cost = partial_cost + self.heuristic(neighbor.p, end_pos)
-                if total_cost <= self.best_total_cost and partial_cost < partial_costs[neighbor]:
+                if total_cost <= self.best_total_cost and op(partial_cost, partial_costs[neighbor]):
                     self.came_from[neighbor].add(cur)
                     partial_costs[neighbor] = partial_cost
                     self.total_costs[neighbor] = total_cost
                     if neighbor not in heap:
                         heapq.heappush(heap, neighbor)
+
+        yield None
+
+    def all_shortest_paths(
+        self, start_node: AStarNode, end_pos: Point
+    ) -> Generator[tuple[int, AStarNode]]:
+        return self.shortest_path(start_node, end_pos, op=le)
 
 
 @dataclass

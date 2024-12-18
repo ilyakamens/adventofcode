@@ -29,15 +29,17 @@ def _print_rich(p1_pairs, p2_pairs):
     table = Table(show_footer=False)
     table_centered = Align.center(table)
     with Live(table_centered, console=console, screen=False, refresh_per_second=20):
-        table.add_column('Part', justify='center', style='cyan', no_wrap=True)
-        table.add_column('Result', justify='center', no_wrap=True)
-        table.add_column('Time', justify='center', no_wrap=True)
+        table.add_column('Part', justify='left', style='cyan', no_wrap=True)
+        table.add_column('Result', justify='left', no_wrap=True)
+        table.add_column('Time', justify='left', no_wrap=True)
 
-        for (p1_mine, p1_time), p1_their in p1_pairs:
-            table.add_row('A', _format_result(p1_mine, p1_their), f'{p1_time}ms')
+        for i, ((p1_mine, p1_time), p1_their) in enumerate(p1_pairs):
+            part = '1 (real)' if not p1_their else f'1 (example {i + 1})'
+            table.add_row(part, _format_result(p1_mine, p1_their), f'{p1_time}ms')
 
-        for (p2_mine, p2_time), p2_their in p2_pairs:
-            table.add_row('B', _format_result(p2_mine, p2_their), f'{p2_time}ms')
+        for i, ((p2_mine, p2_time), p2_their) in enumerate(p2_pairs):
+            part = '2 (real)' if not p2_their else f'2 (example {i + 1})'
+            table.add_row(part, _format_result(p2_mine, p2_their), f'{p2_time}ms')
 
     return table
 
@@ -56,20 +58,23 @@ def main(
             break
         with open(example_path) as f:
             example_input = f.read()
+        print(f'P1: Example {i}')
         p1_mines.append(timeit(lambda: p1(str(i), example_input)))
+        print(f'P2: Example {i}')
         p2_mines.append(timeit(lambda: p2(str(i), example_input)))
         i += 1
 
     with open(path + '/input.txt') as f:
         input = f.read()
 
-    print('Real:')
     if [p[0] for p in p1_mines] == p1_theirs:
+        print('P1: Real')
         p1_answer, p1_duration = timeit(lambda: p1('real', input))
         aocd.submit(p1_answer, part='a', day=int(day), year=int(year))
     else:
         p1_answer, p1_duration = 'Skipped', ''
     if [p[0] for p in p2_mines] == p2_theirs:
+        print('P2: Real')
         p2_answer, p2_duration = timeit(lambda: p2('real', input))
         aocd.submit(p2_answer, part='b', day=int(day), year=int(year))
     else:
