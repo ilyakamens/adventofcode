@@ -2,7 +2,7 @@
 
 """https://adventofcode.com/2024/day/18."""
 
-from main import main, runs
+from main import main
 from utils import AStarGrid, AStarNode, binary_search, numbers
 
 
@@ -19,15 +19,7 @@ def create_grid(lines: list[str], size: int, stop: int) -> MemoryGrid:
     return grid
 
 
-@runs(cases={'1'})
-def p1(input: str, case: str) -> int:
-    if case == '1':
-        size = 7
-        stop = 12
-    else:
-        size = 71
-        stop = 1024
-
+def p1(input: str, size: int, stop: int) -> int:
     lines = input.splitlines()
     grid: MemoryGrid = create_grid(lines, size, stop)
 
@@ -38,13 +30,7 @@ def p1(input: str, case: str) -> int:
     return grid.best_total_cost
 
 
-@runs(cases={'1'})
-def p2(input: str, case: str) -> int:
-    if case == '1':
-        size = 7
-    else:
-        size = 71
-
+def p2(input: str, size: int, stop: int) -> int:
     lines = input.splitlines()
 
     def shortest_path_exists(i: int) -> bool:
@@ -53,8 +39,8 @@ def p2(input: str, case: str) -> int:
         end_pos = (size - 1, size - 1)
         return next(grid.shortest_path(start_node, end_pos)) is not None
 
-    return lines[binary_search(shortest_path_exists, 0, len(lines) - 1)]
+    return lines[binary_search(shortest_path_exists, stop, len(lines) - 1)]
 
 
 if __name__ == '__main__':
-    main(p1, p2, [22], ['6,1'])
+    main(p1, p2)

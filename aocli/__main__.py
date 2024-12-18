@@ -19,16 +19,18 @@ args = parser.parse_args()
 
 data = get_data(year=args.year, day=int(args.day))
 
-root_input_path = SRC / 'input' / args.year / args.day
-input_path = str(root_input_path / 'input.txt')
+root_input_path = SRC / 'input' / args.year
+input_path = str(root_input_path / f'{args.day}.toml')
 Path(str(root_input_path)).mkdir(parents=True, exist_ok=True)
-with open(input_path, 'w') as f:
-    f.write(data)
-example_path = str(root_input_path / 'example-1.txt')
-if not os.path.exists(example_path):
-    open(example_path, 'w').close()
+if not os.path.exists(input_path):
+    with open(input_path, 'w') as f:
+        f.write('[[examples]]\n')
+        f.write('answers.p1 = []\n')
+        f.write("input = '''\n\n'''\n\n")
+        f.write('[real]\n')
+        f.write(f"input = '''\n{data}'''")
 
 daypath = str(SRC / args.year / args.day) + '.py'
 if not os.path.exists(daypath):
     call([str(ROOT / 'mkday.sh'), args.year, args.day])
-call([daypath, args.year, args.day, root_input_path])
+call([daypath, args.year, args.day, input_path])

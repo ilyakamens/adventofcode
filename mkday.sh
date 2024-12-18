@@ -21,16 +21,14 @@ cat > $pyfile <<EOL
 from main import main, runs
 
 
-@runs(cases={'1'})
-def p1(input: str, case: str) -> int:
+def p1(input: str) -> int:
     pass
 
 
-@runs(cases={'1'})
-def p2(input: str, case: str) -> int:
+def p2(input: str) -> int:
     pass
 
 
 if __name__ == '__main__':
-    main(p1, p2, [0], [0])
+    main(p1, p2)
 EOL
