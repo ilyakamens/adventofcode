@@ -347,7 +347,7 @@ class AStarGrid(Grid):
             for neighbor, cost in self.get_neighbors(cur):
                 partial_cost = partial_costs[cur] + cost
                 total_cost = partial_cost + self.heuristic(neighbor.p, end_pos)
-                if total_cost <= self.best_total_cost and partial_cost <= partial_costs[neighbor]:
+                if total_cost <= self.best_total_cost and partial_cost < partial_costs[neighbor]:
                     self.came_from[neighbor].add(cur)
                     partial_costs[neighbor] = partial_cost
                     self.total_costs[neighbor] = total_cost
