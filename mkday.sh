@@ -18,7 +18,7 @@ cat > $pyfile <<EOL
 
 """https://adventofcode.com/$1/day/$((10#$2))."""
 
-from main import main, runs
+from main import main
 
 
 def p1(input: str) -> int:

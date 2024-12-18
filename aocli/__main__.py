@@ -25,7 +25,7 @@ Path(str(root_input_path)).mkdir(parents=True, exist_ok=True)
 if not os.path.exists(input_path):
     with open(input_path, 'w') as f:
         f.write('[[examples]]\n')
-        f.write('answers.p1 = []\n')
+        f.write('answers.p1 = 0\n')
         f.write("input = '''\n\n'''\n\n")
         f.write('[real]\n')
         f.write(f"input = '''\n{data}'''")
