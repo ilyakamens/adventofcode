@@ -24,15 +24,11 @@ class ReindeerGrid(AStarGrid):
         return 1 if f.dir == t.dir else 1001
 
     def get_neighbors(self, node: ReindeerNode) -> list[tuple[ReindeerNode, int]]:
-        neighbors: list[tuple[ReindeerNode, int]] = []
-        for d in self.dir:
-            neighbor_pos = self.neighbor(node.p, d)
-            if Dir.opposite(node.dir) == d or self[neighbor_pos] == '#':
-                continue
-
-            neighbors.append(ReindeerNode(self, neighbor_pos, d))
-
-        return neighbors
+        return [
+            ReindeerNode(self, np, d)
+            for np, d in self.neighbors(node.p)
+            if self[np] != '#' and d != Dir.opposite(node.dir)
+        ]
 
 
 def p1(input: str) -> int:

@@ -8,7 +8,7 @@ from utils import AStarGrid, AStarNode, binary_search, numbers
 
 class MemoryGrid(AStarGrid):
     def get_neighbors(self, node: AStarNode) -> list[tuple[AStarNode, int]]:
-        return [n for n in super().get_neighbors(node) if self[n.p] != '#']
+        return [n for n in super().neighbor_nodes(node) if self[n.p] != '#']
 
 
 def create_grid(lines: list[str], size: int, stop: int) -> MemoryGrid:

@@ -204,12 +204,12 @@ class Grid:
     def neighbor(self, p: Point, dir=Dir) -> Point:
         return sum_tuples(p, dir)
 
-    def neighbors(self, p: Point, dir=Dir, allow_out=False) -> list[Point]:
+    def neighbors(self, p: Point, dir=Dir, allow_out=False) -> list[tuple[Point, Vector]]:
         neighbors = []
         for d in dir.iter():
             n = sum_tuples(p, d)
             if n in self or allow_out:
-                neighbors.append(n)
+                neighbors.append((n, d))
 
         return neighbors
 
@@ -318,8 +318,8 @@ class AStarGrid(Grid):
     def cost(self, f: AStarNode, t: AStarNode) -> int:
         return 1
 
-    def get_neighbors(self, node: AStarNode) -> list[AStarNode]:
-        return [AStarNode(self, p) for p in self.neighbors(node.p, self.dir)]
+    def neighbor_nodes(self, node: AStarNode) -> list[AStarNode]:
+        return [AStarNode(self, p) for p, _ in self.neighbors(node.p, self.dir)]
 
     def shortest_path(
         self,
