@@ -53,11 +53,11 @@ def main(p1: Callable[[str], int], p2: Callable[[str], int]):
 
         p1_answer, p1_duration = 'Skipped', ''
         p2_answer, p2_duration = 'Skipped', ''
-        if p1_mines == p1_theirs:
+        if p1_theirs and p1_mines == p1_theirs:
             p1_answer, p1_duration = run(p1, data['real'])
             aocd.submit(p1_answer, part='a', day=int(day), year=int(year))
             _add_row(table, '1 (real)', p1_answer, None, p1_duration)
-        if p2_mines == p2_theirs:
+        if p2_theirs and p2_mines == p2_theirs:
             p2_answer, p2_duration = run(p2, data['real'])
             aocd.submit(p2_answer, part='b', day=int(day), year=int(year))
             _add_row(table, '2 (real)', p2_answer, None, p2_duration)
