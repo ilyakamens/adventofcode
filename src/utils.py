@@ -308,6 +308,9 @@ class AStarGrid(Grid):
 
         self.dir = dir
 
+        self.init()
+
+    def init(self):
         self.total_costs = defaultdict(lambda: float('inf'))
         self.came_from = defaultdict(set)
         self.best_total_cost = float('inf')
@@ -360,15 +363,17 @@ class AStarGrid(Grid):
         return self.shortest_path(start_node, end_pos, op=le)
 
     def all_path_points(self, end: AStarNode) -> set[Point]:
-        seen = set()
+        seen = [end.p]
 
-        froms = {end}
-        while froms:
-            node = froms.pop()
-            seen.add(node.p)
-            froms.update(self.came_from[node])
+        f = end
+        while True:
+            seen.append(f.p)
+            came_from = self.came_from[f]
+            if not came_from:
+                break
+            f = came_from.pop()
 
-        return seen
+        return list(reversed(seen))
 
 
 @dataclass
