@@ -18,9 +18,6 @@ TOO_LOW = '(too low)'
 TOO_HIGH = '(too high)'
 COWARD = 'coward'
 
-interval = None
-table_rows: list['Row'] = []
-
 
 @dataclass
 class Row:
@@ -87,75 +84,89 @@ def _format_result(result: int, expected: int | str) -> str:
     )
 
 
-def _add_placeholder_row(live: Live, part: str):
-    global interval
-    table_rows.append(Row(part, '?', None))
-    interval = SetInterval(1, lambda: _gen_table(live))
+@dataclass
+class Runner:
+    year: int
+    day: int
+    input_path: str
+    p1: Callable[[str], int]
+    p2: Callable[[str], int]
 
+    def __post_init__(self):
+        self.table_rows = []
+        self.live = Live()
+        with open(self.input_path, 'rb') as f:
+            self.data = tomllib.load(f)
 
-def _replace_row(live: Live, part: str, mine: str, theirs: str, time: str):
-    global interval
-    interval.cancel()
-    table_rows[-1] = Row(part, _format_result(mine, theirs), time)
-    _gen_table(live)
+    def __enter__(self):
+        self.live.__enter__()
 
+        return self
 
-def _gen_table(live: Live):
-    table = Table(show_footer=False)
-    table.add_column('Part', justify='left', style='cyan', no_wrap=True)
-    table.add_column('Result', justify='left', no_wrap=True)
-    table.add_column('Time', justify='left', no_wrap=True)
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        self.live.__exit__(exc_type, exc_val, exc_tb)
 
-    for row in table_rows:
-        table.add_row(row.part, row.result, row.get_time)
+    def _add_placeholder_row(self, part: str):
+        self.table_rows.append(Row(part, '?', None))
+        self.interval = SetInterval(1, self._gen_table)
 
-    live.update(Align.center(table))
+    def _replace_row(self, part: str, mine: str, theirs: str, time: str):
+        self.interval.cancel()
+        self.table_rows[-1] = Row(part, _format_result(mine, theirs), time)
+        self._gen_table()
+
+    def _gen_table(self):
+        table = Table(show_footer=False)
+        table.add_column('Part', justify='left', style='cyan', no_wrap=True)
+        table.add_column('Result', justify='left', no_wrap=True)
+        table.add_column('Time', justify='left', no_wrap=True)
+
+        for row in self.table_rows:
+            table.add_row(row.part, row.result, row.get_time)
+
+        self.live.update(Align.center(table))
+
+    def _iter_parts(self):
+        p1_mines, p2_mines = [], []
+        p1_theirs, p2_theirs = [], []
+        for i, (k, f, m, t, p) in enumerate(
+            [
+                ('p1', self.p1, p1_mines, p1_theirs, 'a'),
+                ('p2', self.p2, p2_mines, p2_theirs, 'b'),
+            ],
+            start=1,
+        ):
+            yield i, k, f, m, t, p
+
+    def run(self):
+        for i, k, f, m, t, p in self._iter_parts():
+            for j, example in enumerate(self.data.get('examples', []), start=1):
+                ex = example.get(k)
+                if not ex:
+                    continue
+                self._add_placeholder_row(f'{k} (example {j})')
+                answer, time = timeit(lambda: f(example['input'], **ex.get('args', {})))
+                m.append(answer)
+                t.append(ex['answer'])
+                self._replace_row(f'{k} (example {j})', answer, ex['answer'], time)
+
+        # Use `m` and `t` from above since that has `mine` and `their` answers.
+        for i, k, f, _, _, p in self._iter_parts():
+            answer, duration = 'Skipped', ''
+            if not t or m != t:
+                continue
+            self._add_placeholder_row(f'{i} (real)')
+            real = self.data['real']
+            answer, duration = timeit(lambda: f(real['input'], **real[k].get('args', {})))
+            resp = submit(lambda: aocd.submit(answer, part=p, day=self.day, year=self.year))
+            self._replace_row(f'{i} (real)', answer, resp, duration)
 
 
 def main(p1: Callable[[str], int], p2: Callable[[str], int]):
-    global table_rows
-
     year, day, input_path = sys.argv[1:]
 
-    with open(input_path, 'rb') as f:
-        data = tomllib.load(f)
-
-    with Live() as live:
-        p1_mines, p2_mines = [], []
-        p1_theirs, p2_theirs = [], []
-        for i, example in enumerate(data.get('examples', []), start=1):
-            p1_example = example.get('p1')
-            p2_example = example.get('p2')
-            if p1_example:
-                _add_placeholder_row(live, f'1 (example {i})')
-                p1_answer, p1_time = run(p1, example['input'], p1_example)
-                p1_mines.append(p1_answer)
-                p1_theirs.append(p1_example['answer'])
-                _replace_row(live, f'1 (example {i})', p1_answer, p1_example['answer'], p1_time)
-            if p2_example:
-                _add_placeholder_row(live, f'2 (example {i})')
-                p2_answer, p2_time = run(p2, example['input'], p2_example)
-                p2_mines.append(p2_answer)
-                p2_theirs.append(p2_example['answer'])
-                _replace_row(live, f'2 (example {i})', p2_answer, p2_example['answer'], p2_time)
-
-        p1_answer, p1_duration = 'Skipped', ''
-        p2_answer, p2_duration = 'Skipped', ''
-        if p1_theirs and p1_mines == p1_theirs:
-            _add_placeholder_row(live, '1 (real)')
-            p1_answer, p1_duration = run(p1, data['real']['input'], data['real']['p1'])
-            resp = submit(lambda: aocd.submit(p1_answer, part='a', day=int(day), year=int(year)))
-            _replace_row(live, '1 (real)', p1_answer, resp, p1_duration)
-        if p2_theirs and p2_mines == p2_theirs:
-            _add_placeholder_row(live, '2 (real)')
-            p2_answer, p2_duration = run(p2, data['real']['input'], data['real']['p2'])
-            resp = submit(lambda: aocd.submit(p2_answer, part='b', day=int(day), year=int(year)))
-            resp = '(too low)'
-            _replace_row(live, '2 (real)', p2_answer, resp, p2_duration)
-
-
-def run(f, input, data):
-    return timeit(lambda: f(input, **data.get('args', {})))
+    with Runner(int(year), int(day), input_path, p1, p2) as runner:
+        runner.run()
 
 
 def timeit(f):
