@@ -362,18 +362,18 @@ class AStarGrid(Grid):
     def shortest_paths(self, start_node: AStarNode, end_pos: Point) -> Generator[AStarNode]:
         return self.shortest_path(start_node, end_pos, op=le)
 
-    def all_path_points(self, end: AStarNode) -> set[Point]:
-        seen = [end.p]
+    def path(self, end: AStarNode) -> list[Point]:
+        path = deque([end.p])
 
-        f = end
-        while True:
-            seen.append(f.p)
-            came_from = self.came_from[f]
-            if not came_from:
-                break
-            f = came_from.pop()
+        while self.came_from[end]:
+            end = self.came_from[end].pop()
+            path.appendleft(end.p)
 
-        return list(reversed(seen))
+        return list(path)
+
+    def all_path_points(self, end: AStarNode) -> list[Point]:
+        # TODO: Implement this.
+        pass
 
 
 @dataclass

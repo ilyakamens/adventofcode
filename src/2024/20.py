@@ -12,7 +12,7 @@ class RaceGrid(AStarGrid):
     def get_neighbors(self, node: AStarNode) -> list[tuple[AStarNode, int]]:
         return [n for n in super().neighbor_nodes(node) if self[n.p] != '#']
 
-    def all_within_dist(self, p: Point, max_dist: int) -> list[Point]:
+    def cheat_ends(self, p: Point, max_dist: int) -> list[Point]:
         points = {}
         seen = set()
 
@@ -25,7 +25,7 @@ class RaceGrid(AStarGrid):
 
             seen.add(point)
             if dist > max_dist:
-                continue
+                break
             if self[point] != '#':
                 points[point] = dist
             for neighbor, _ in self.neighbors(point):
@@ -33,75 +33,40 @@ class RaceGrid(AStarGrid):
 
         return points
 
+    def cheats_for_path(self, path: list[Point], seconds_saved: int, max_dist: int) -> int:
+        count = 0
 
-def cheat_pairs(grid: RaceGrid, path: set[Point]) -> list[tuple[int, int]]:
-    pairs = []
-    for i, p in enumerate(path):
-        for n1, _ in grid.neighbors(p):
-            if grid[n1] == '#':
-                for n2, _ in grid.neighbors(n1):
-                    if n2 == p or grid[n2] == '#':
-                        continue
-                    if n2 in path[:i]:
-                        continue
-                    pairs.append((n1, n2))
-    return pairs
+        for i, p in enumerate(path):
+            nodes = self.cheat_ends(p, max_dist)
+            for node, dist in nodes.items():
+                if path.index(node) - i - dist >= seconds_saved:
+                    count += 1
+
+        return count
 
 
-def cheats_for_path(path: list[Point], grid: RaceGrid, seconds_saved: int) -> int:
-    count = 0
-    print('len', len(path))
-    for i, p in enumerate(path):
-        print(i)
-        nodes = grid.all_within_dist(p, 20)
-        for node, dist in nodes.items():
-            idx = path.index(node)
-            if idx - i - dist >= seconds_saved:
-                count += 1
-
-    return count
-
-
-def p1(input: str, seconds_saved: int) -> int:
+def p1(input: str, seconds_saved: int, max_dist: int) -> int:
     grid = RaceGrid(input)
 
     start_node = AStarNode(grid, grid.find('S'))
     end_pos = grid.find('E')
     end_node = next(grid.shortest_path(start_node, end_pos))
 
-    default_cost = grid.best_total_cost
-    path = grid.all_path_points(end_node)
+    path = grid.path(end_node)
 
-    count = 0
-
-    pairs = cheat_pairs(grid, path)
-
-    for p1, p2 in pairs:
-        grid.init()
-        old_p1 = grid[p1]
-        old_p2 = grid[p2]
-        grid[p1] = '1'
-        grid[p2] = '2'
-
-        next(grid.shortest_path(start_node, end_pos))
-        if default_cost - grid.best_total_cost == seconds_saved:
-            count += 1
-        grid[p1] = old_p1
-        grid[p2] = old_p2
-
-    return count
+    return grid.cheats_for_path(path, seconds_saved, max_dist)
 
 
-def p2(input: str, seconds_saved: int) -> int:
+def p2(input: str, seconds_saved: int, max_dist: int) -> int:
     grid = RaceGrid(input)
 
     start_node = AStarNode(grid, grid.find('S'))
     end_pos = grid.find('E')
     end_node = next(grid.shortest_path(start_node, end_pos))
 
-    path = grid.all_path_points(end_node)
+    path = grid.path(end_node)
 
-    return cheats_for_path(path, grid, seconds_saved)
+    return grid.cheats_for_path(path, seconds_saved, max_dist)
 
 
 if __name__ == '__main__':

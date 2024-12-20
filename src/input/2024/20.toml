@@ -1,7 +1,10 @@
 [[examples]]
-answers.p1 = 2
-answers.p2 = 285
-args.seconds_saved = 50
+p1.answer = 8
+p2.answer = 285
+p1.args.seconds_saved = 12
+p2.args.seconds_saved = 50
+p1.args.max_dist = 2
+p2.args.max_dist = 20
 input = '''
 ###############
 #...#...#.....#
@@ -21,7 +24,10 @@ input = '''
 '''
 
 [real]
-args.seconds_saved = 100
+p1.args.max_dist = 2
+p2.args.max_dist = 20
+p1.args.seconds_saved = 100
+p2.args.seconds_saved = 100
 input = '''
 #############################################################################################################################################
 #.......#...#.......#...#.....#...###...............###.......#...#...#...#.....#.......###.....#...................###.....................#
