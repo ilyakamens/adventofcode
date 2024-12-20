@@ -86,11 +86,9 @@ def _format_result(result: int, expected: int | str) -> str:
 
 @dataclass
 class Runner:
-    year: int
-    day: int
-    input_path: str
     p1: Callable[[str], int]
     p2: Callable[[str], int]
+    input_path: str
 
     def __post_init__(self):
         self.table_rows = []
@@ -138,7 +136,7 @@ class Runner:
         ):
             yield i, k, f, m, t, p
 
-    def run(self):
+    def run(self, year: int, day: int):
         for i, k, f, m, t, p in self._iter_parts():
             for j, example in enumerate(self.data.get('examples', []), start=1):
                 ex = example.get(k)
@@ -158,15 +156,15 @@ class Runner:
             self._add_placeholder_row(f'{i} (real)')
             real = self.data['real']
             answer, duration = timeit(lambda: f(real['input'], **real[k].get('args', {})))
-            resp = submit(lambda: aocd.submit(answer, part=p, day=self.day, year=self.year))
+            resp = submit(lambda: aocd.submit(answer, part=p, day=day, year=year))
             self._replace_row(f'{i} (real)', answer, resp, duration)
 
 
 def main(p1: Callable[[str], int], p2: Callable[[str], int]):
     year, day, input_path = sys.argv[1:]
 
-    with Runner(int(year), int(day), input_path, p1, p2) as runner:
-        runner.run()
+    with Runner(p1, p2, input_path) as runner:
+        runner.run(int(year), int(day))
 
 
 def timeit(f):
