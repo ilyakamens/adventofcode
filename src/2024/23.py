@@ -9,6 +9,16 @@ from itertools import combinations
 from main import main
 
 
+def parse(input: str) -> dict:
+    connected_to = defaultdict(set)
+    for line in input.splitlines():
+        a, b = line.split('-')
+        connected_to[a].add(b)
+        connected_to[b].add(a)
+
+    return connected_to
+
+
 def connected(computers: Iterable[str], connected_to: dict) -> bool:
     for a, b in combinations(computers, 2):
         if a not in connected_to[b]:
@@ -27,11 +37,7 @@ def find_groups(start: str, connected_to: dict, size: int) -> list[tuple[str]]:
 
 
 def p1(input: str) -> int:
-    connected_to = defaultdict(set)
-    for line in input.splitlines():
-        a, b = line.split('-')
-        connected_to[a].add(b)
-        connected_to[b].add(a)
+    connected_to = parse(input)
 
     lans = set()
     for computer in connected_to.keys():
@@ -44,23 +50,15 @@ def p1(input: str) -> int:
 
 
 def p2(input: str) -> int:
-    connected_to = defaultdict(set)
-    for line in input.splitlines():
-        a, b = line.split('-')
-        connected_to[a].add(b)
-        connected_to[b].add(a)
+    connected_to = parse(input)
 
     max_size = max(len(v) for v in connected_to.values())
-    biggest_group = None
-    while biggest_group is None:
+    while True:
         for computer in connected_to.keys():
             groups = find_groups(computer, connected_to, max_size)
             for group in groups:
-                biggest_group = group
-                break
+                return ','.join(group)
         max_size -= 1
-
-    return ','.join(biggest_group)
 
 
 if __name__ == '__main__':
